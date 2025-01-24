@@ -81,20 +81,20 @@ const GoalPage = () => {
   };
 
   return (
-    <div className="container py-8 max-w-4xl">
+    <div className="container py-4 md:py-8 px-4 md:px-8 max-w-4xl mx-auto">
       <Button 
         variant="ghost" 
         onClick={() => navigate('/')}
-        className="mb-6"
+        className="mb-4 md:mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Dashboard
       </Button>
 
-      <div className="space-y-6">
-        <div className="flex justify-between items-start">
+      <div className="space-y-4 md:space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{goal.title}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">{goal.title}</h1>
             <p className="text-muted-foreground">
               {format(new Date(goal.startDate), 'PP')} - {format(new Date(goal.endDate), 'PP')}
             </p>
@@ -105,23 +105,24 @@ const GoalPage = () => {
           </Button>
         </div>
 
-        <div className="bg-card rounded-lg p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Progress Overview</h2>
-          <div className="h-[300px]">
+        <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
+          <h2 className="text-lg md:text-xl font-semibold mb-4">Progress Overview</h2>
+          <div className="h-[300px] md:h-[400px]">
             <ProgressGraph goal={goal} />
           </div>
         </div>
 
         {goal.type === 'task' && (
-          <div className="bg-card rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Tasks</h2>
-            <form onSubmit={handleAddTask} className="flex gap-2 mb-4">
+          <div className="bg-card rounded-lg p-4 md:p-6 shadow-sm">
+            <h2 className="text-lg md:text-xl font-semibold mb-4">Tasks</h2>
+            <form onSubmit={handleAddTask} className="flex flex-col md:flex-row gap-2 mb-4">
               <Input
                 placeholder="Add a new task..."
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
+                className="flex-1"
               />
-              <Button type="submit">
+              <Button type="submit" className="whitespace-nowrap">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Task
               </Button>

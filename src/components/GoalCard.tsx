@@ -19,21 +19,21 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
       className="hover:shadow-lg transition-shadow cursor-pointer"
       onClick={() => navigate(`/goal/${goal.id}`)}
     >
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
-        <p className="text-sm text-muted-foreground">
+      <CardHeader className="pb-2 px-4 md:px-6">
+        <CardTitle className="text-base md:text-lg font-medium">{goal.title}</CardTitle>
+        <p className="text-xs md:text-sm text-muted-foreground">
           {goal.type === 'task' ? 'Task-based' : 'Numerical'} Goal
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 md:px-6">
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs md:text-sm">
             <span>Actual Progress</span>
             <span>{actualProgress.toFixed(1)}%</span>
           </div>
           <Progress value={actualProgress} className="h-2 bg-gray-200" />
           
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-xs md:text-sm">
             <span>Expected Progress</span>
             <span>{expectedProgress.toFixed(1)}%</span>
           </div>
