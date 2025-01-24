@@ -6,6 +6,12 @@ export interface Subtask {
   completed: boolean;
 }
 
+export interface ProgressLog {
+  id: string;
+  timestamp: string;
+  value: number;
+}
+
 export interface Goal {
   id: string;
   title: string;
@@ -16,4 +22,5 @@ export interface Goal {
   targetValue: number;
   subtasks?: Subtask[];
   description?: string;
+  progressLogs: ProgressLog[];
 }

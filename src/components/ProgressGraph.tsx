@@ -1,10 +1,8 @@
 import React from "react";
 import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Goal } from "../types/goal";
-import { calculateActualProgress, calculateExpectedProgress } from "../utils/progressCalculations";
-import { differenceInDays, addDays, format } from "date-fns";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { differenceInDays, addDays, format, differenceInMilliseconds, isAfter, isBefore, isEqual } from "date-fns";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 interface ProgressGraphProps {
@@ -22,6 +20,28 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
+const calculateLinearExpectedProgress = (currentDate: Date, startDate: Date, endDate: Date) => {
+    const totalDuration = differenceInMilliseconds(endDate, startDate);
+    const currentDuration = differenceInMilliseconds(currentDate, startDate);
+    return Math.min(100, Math.max(0, (currentDuration / totalDuration) * 100));
+};
+
+const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"]) => {
+    // Sort logs by timestamp in ascending order
+    const sortedLogs = [...progressLogs].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+    // Find the last log entry that's before or equal to the given date
+    const lastValidLog = sortedLogs.reduce((prev, curr) => {
+        const currDate = new Date(curr.timestamp);
+        if ((isEqual(currDate, date) || isBefore(currDate, date)) && (!prev || isAfter(currDate, new Date(prev.timestamp)))) {
+            return curr;
+        }
+        return prev;
+    }, null);
+
+    return lastValidLog ? lastValidLog.value : 0;
+};
+
 export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
     const startDate = new Date(goal.startDate);
     const endDate = new Date(goal.endDate);
@@ -29,41 +49,39 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
 
     const data = Array.from({ length: totalDays + 1 }, (_, index) => {
         const currentDate = addDays(startDate, index);
-        const tempGoal = {
-            ...goal,
-            endDate: currentDate.toISOString(),
-        };
-
         return {
             date: format(currentDate, "MMM dd"),
-            expected: calculateExpectedProgress(goal),
-            actual: calculateActualProgress(tempGoal),
+            expected: calculateLinearExpectedProgress(currentDate, startDate, endDate),
+            actual: getProgressValueForDate(currentDate, goal.progressLogs || []),
         };
     });
 
-    const currentProgress = calculateActualProgress(goal);
-    const expectedProgress = calculateExpectedProgress(goal);
+    const currentProgress = getProgressValueForDate(new Date(), goal.progressLogs || []);
+    const expectedProgress = calculateLinearExpectedProgress(new Date(), startDate, endDate);
     const progressDiff = (currentProgress - expectedProgress).toFixed(1);
     const isAhead = currentProgress > expectedProgress;
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Progress Overview</CardTitle>
-                <CardDescription>
+        <div className="space-y-4">
+            <div className="text-left">
+                <h2 className="text-2xl font-semibold">Progress Overview</h2>
+                <p className="text-sm text-muted-foreground">
                     Tracking your progress from {format(startDate, "PP")} to {format(endDate, "PP")}
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
+                </p>
+            </div>
+            <div className="relative">
                 <ChartContainer config={chartConfig}>
                     <AreaChart
                         data={data}
                         margin={{
-                            left: 12,
-                            right: 12,
+                            left: 0,
+                            right: 8,
+                            top: 12,
+                            bottom: 12,
                         }}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                        <YAxis domain={[0, 100]} hide={false} tickLine={false} axisLine={false} tickMargin={4} width={32} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <defs>
                             <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
@@ -77,35 +95,31 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                         </defs>
                         <Area
                             dataKey="actual"
-                            type="natural"
+                            type="stepAfter"
                             fill="url(#fillActual)"
                             fillOpacity={0.4}
                             stroke="var(--color-actual)"
-                            stackId="a"
+                            strokeWidth={2}
                         />
                         <Area
                             dataKey="expected"
-                            type="natural"
+                            type="monotone"
                             fill="url(#fillExpected)"
                             fillOpacity={0.4}
                             stroke="var(--color-expected)"
-                            stackId="a"
+                            strokeWidth={2}
                         />
                     </AreaChart>
                 </ChartContainer>
-            </CardContent>
-            <CardFooter>
-                <div className="flex w-full items-start gap-2 text-sm">
-                    <div className="grid gap-2">
-                        <div className="flex items-center gap-2 font-medium leading-none">
-                            {isAhead ? "Ahead" : "Behind"} by {Math.abs(Number(progressDiff))}% {isAhead && <TrendingUp className="h-4 w-4" />}
-                        </div>
-                        <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                            Current Progress: {currentProgress.toFixed(1)}%
-                        </div>
+            </div>
+            <div className="flex w-full items-start gap-2 text-sm">
+                <div className="grid gap-2">
+                    <div className="flex items-center gap-2 font-medium leading-none">
+                        {isAhead ? "Ahead" : "Behind"} by {Math.abs(Number(progressDiff))}% {isAhead && <TrendingUp className="h-4 w-4" />}
                     </div>
+                    <div className="flex items-center gap-2 leading-none text-muted-foreground">Current Progress: {currentProgress.toFixed(1)}%</div>
                 </div>
-            </CardFooter>
-        </Card>
+            </div>
+        </div>
     );
 };

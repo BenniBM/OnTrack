@@ -42,12 +42,13 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
         const newGoal: Goal = {
             id: crypto.randomUUID(),
             title: data.title,
-            type: data.type,
+            type: "numerical",
             startDate: data.startDate,
             endDate: data.endDate,
             currentValue: 0,
             targetValue: Number(data.targetValue),
-            subtasks: data.type === "task" ? [] : undefined,
+            subtasks: undefined,
+            progressLogs: [],
         };
 
         onGoalCreate(newGoal);
