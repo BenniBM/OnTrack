@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Goal } from '../types/goal';
@@ -6,17 +7,17 @@ import { calculateActualProgress, calculateExpectedProgress } from '../utils/pro
 
 interface GoalCardProps {
   goal: Goal;
-  onClick: () => void;
 }
 
-export const GoalCard: React.FC<GoalCardProps> = ({ goal, onClick }) => {
+export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
+  const navigate = useNavigate();
   const actualProgress = calculateActualProgress(goal);
   const expectedProgress = calculateExpectedProgress(goal);
   
   return (
     <Card 
       className="hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={onClick}
+      onClick={() => navigate(`/goal/${goal.id}`)}
     >
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
