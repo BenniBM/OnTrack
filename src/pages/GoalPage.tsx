@@ -75,10 +75,6 @@ const GoalPage = () => {
         });
 
         saveGoals(updatedGoals);
-        toast({
-            title: "Progress Logged",
-            description: `Progress updated to ${progressValue}%`,
-        });
         window.location.reload();
     };
 
@@ -159,7 +155,12 @@ const GoalPage = () => {
                         <Card className="p-6">
                             <h2 className="text-lg md:text-xl font-semibold mb-4">Tasks</h2>
                             <form onSubmit={handleAddTask} className="flex flex-col md:flex-row gap-2 mb-4">
-                                <Input placeholder="Add a new task..." value={newTask} onChange={(e) => setNewTask(e.target.value)} className="flex-1" />
+                                <Input
+                                    placeholder="Add a new task..."
+                                    value={newTask}
+                                    onChange={(e) => setNewTask(e.target.value)}
+                                    className="flex-1"
+                                />
                                 <Button type="submit" className="whitespace-nowrap">
                                     <Plus className="mr-2 h-4 w-4" />
                                     Add Task
