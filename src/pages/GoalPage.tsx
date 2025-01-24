@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ArrowLeft, MoreHorizontal, Plus, Trash2 } from "lucide-react";
@@ -17,11 +17,11 @@ const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [newTask, setNewTask] = useState("");
-    const [progressValue, setProgressValue] = useState<number>(0);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const goals = loadGoals();
     const goal = goals.find((g) => g.id === id);
+    const [progressValue, setProgressValue] = useState<number>(goal.currentValue);
 
     if (!goal) {
         navigate("/");
@@ -160,7 +160,7 @@ const GoalPage = () => {
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span>Current Progress</span>
-                                <span>{progressValue}%</span>
+                                <span>{progressValue === 0 ? goal.currentValue : progressValue}%</span>
                             </div>
                             <Slider
                                 value={[progressValue]}
