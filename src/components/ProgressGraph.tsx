@@ -65,11 +65,11 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
         <div className="space-y-4">
             <div className="text-left">
                 <h2 className="text-2xl font-semibold">Progress Overview</h2>
-                <p className="text-sm text-muted-foreground">
-                    Tracking your progress from {format(startDate, "PP")} to {format(endDate, "PP")}
+                <p className="text-sm mb-8 text-muted-foreground">
+                    Progress from {format(startDate, "PP")} to {format(endDate, "PP")}
                 </p>
             </div>
-            <div className="relative">
+            <div className="relative -mx-4">
                 <ChartContainer config={chartConfig}>
                     <AreaChart
                         data={data}

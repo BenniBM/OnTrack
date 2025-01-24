@@ -108,105 +108,97 @@ const GoalPage = () => {
     };
 
     return (
-        <div className="container py-4 md:py-8 px-4 md:px-8 max-w-4xl mx-auto">
-            <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 md:mb-6">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-            </Button>
+        <div className="container py-4 px-0 md:py-8 max-w-4xl mx-auto">
+            <div className="px-4 md:px-8">
+                <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 md:mb-6">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Dashboard
+                </Button>
 
-            <div className="space-y-4 md:space-y-6">
-                <div className="flex flex-row text-left justify-between items-center gap-2 mb-12">
-                    <h1 className="text-2xl md:text-3xl font-bold">{goal.title}</h1>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline">
-                                <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
-                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogTitle>Confirm Deletion</DialogTitle>
-                                    <DialogDescription>Are you sure you want to delete this goal? This action cannot be undone.</DialogDescription>
-                                    <DialogFooter>
-                                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                            Cancel
+                <div className="space-y-4 md:space-y-6">
+                    <div className="flex flex-row text-left justify-between items-center gap-2 mb-12">
+                        <h1 className="text-2xl md:text-3xl font-bold">{goal.title}</h1>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">
+                                    <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
                                         </Button>
-                                        <Button variant="destructive" onClick={handleDelete}>
-                                            Delete
-                                        </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogTitle>Confirm Deletion</DialogTitle>
+                                        <DialogDescription>
+                                            Are you sure you want to delete this goal? This action cannot be undone.
+                                        </DialogDescription>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                                Cancel
+                                            </Button>
+                                            <Button variant="destructive" onClick={handleDelete}>
+                                                Delete
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+                <ProgressGraph goal={goal} />
+
+                <div className="mt-20">
+                    <div className="text-left">
+                        <h2 className="text-2xl font-semibold">Log Progress</h2>
+                    </div>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span>Current Progress</span>
+                                <span>{progressValue}%</span>
+                            </div>
+                            <Slider
+                                value={[progressValue]}
+                                onValueChange={(value) => setProgressValue(value[0])}
+                                max={100}
+                                step={1}
+                                className="w-full"
+                            />
+                        </div>
+                        <Button onClick={handleLogProgress} className="w-full">
+                            Save Progress
+                        </Button>
+                    </div>
                 </div>
 
-                <div className="space-y-8">
+                {goal.type === "task" && (
                     <Card className="p-6">
-                        <ProgressGraph goal={goal} />
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Log Progress</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Current Progress</span>
-                                        <span>{progressValue}%</span>
-                                    </div>
-                                    <Slider
-                                        value={[progressValue]}
-                                        onValueChange={(value) => setProgressValue(value[0])}
-                                        max={100}
-                                        step={1}
-                                        className="w-full"
-                                    />
+                        <h2 className="text-lg md:text-xl font-semibold mb-4">Tasks</h2>
+                        <form onSubmit={handleAddTask} className="flex flex-col md:flex-row gap-2 mb-4">
+                            <Input placeholder="Add a new task..." value={newTask} onChange={(e) => setNewTask(e.target.value)} className="flex-1" />
+                            <Button type="submit" className="whitespace-nowrap">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Task
+                            </Button>
+                        </form>
+                        <div className="space-y-2">
+                            {goal.subtasks?.map((task: Subtask) => (
+                                <div
+                                    key={task.id}
+                                    className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
+                                    onClick={() => toggleTask(task.id)}>
+                                    <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
+                                    <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
                                 </div>
-                                <Button onClick={handleLogProgress} className="w-full">
-                                    Save Progress
-                                </Button>
-                            </div>
-                        </CardContent>
+                            ))}
+                        </div>
                     </Card>
-
-                    {goal.type === "task" && (
-                        <Card className="p-6">
-                            <h2 className="text-lg md:text-xl font-semibold mb-4">Tasks</h2>
-                            <form onSubmit={handleAddTask} className="flex flex-col md:flex-row gap-2 mb-4">
-                                <Input
-                                    placeholder="Add a new task..."
-                                    value={newTask}
-                                    onChange={(e) => setNewTask(e.target.value)}
-                                    className="flex-1"
-                                />
-                                <Button type="submit" className="whitespace-nowrap">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Add Task
-                                </Button>
-                            </form>
-                            <div className="space-y-2">
-                                {goal.subtasks?.map((task: Subtask) => (
-                                    <div
-                                        key={task.id}
-                                        className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
-                                        onClick={() => toggleTask(task.id)}>
-                                        <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
-                                        <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
-                    )}
-                </div>
+                )}
             </div>
         </div>
     );
