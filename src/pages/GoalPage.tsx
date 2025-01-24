@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -10,12 +10,15 @@ import { loadGoals, saveGoals } from "../services/localStorage";
 import { ProgressGraph } from "../components/ProgressGraph";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [newTask, setNewTask] = useState("");
     const [progressValue, setProgressValue] = useState<number>(0);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const goals = loadGoals();
     const goal = goals.find((g) => g.id === id);
@@ -112,12 +115,36 @@ const GoalPage = () => {
             </Button>
 
             <div className="space-y-4 md:space-y-6">
-                <div className="flex flex-col md:flex-row text-left justify-between items-start gap-2 mb-12">
+                <div className="flex flex-row text-left justify-between items-center gap-2 mb-12">
                     <h1 className="text-2xl md:text-3xl font-bold">{goal.title}</h1>
-                    <Button variant="destructive" onClick={handleDelete}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete Goal
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline">
+                                <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
+                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogTitle>Confirm Deletion</DialogTitle>
+                                    <DialogDescription>Are you sure you want to delete this goal? This action cannot be undone.</DialogDescription>
+                                    <DialogFooter>
+                                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button variant="destructive" onClick={handleDelete}>
+                                            Delete
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
                 <div className="space-y-8">

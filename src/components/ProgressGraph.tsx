@@ -85,12 +85,12 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <defs>
                             <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.8} />
-                                <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
+                                <stop offset="5%" stopColor={isAhead ? "#22c55e" : "#ef4444"} stopOpacity={0.8} />
+                                <stop offset="95%" stopColor={isAhead ? "#22c55e" : "#ef4444"} stopOpacity={0.1} />
                             </linearGradient>
                             <linearGradient id="fillExpected" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--color-expected)" stopOpacity={0.8} />
-                                <stop offset="95%" stopColor="var(--color-expected)" stopOpacity={0.1} />
+                                <stop offset="5%" stopColor="#1eaedb" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="#1eaedb" stopOpacity={0.1} />
                             </linearGradient>
                         </defs>
                         <Area
@@ -98,26 +98,30 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                             type="stepAfter"
                             fill="url(#fillActual)"
                             fillOpacity={0.4}
-                            stroke="var(--color-actual)"
+                            stroke={isAhead ? "#22c55e" : "#ef4444"}
                             strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         />
                         <Area
                             dataKey="expected"
                             type="monotone"
                             fill="url(#fillExpected)"
                             fillOpacity={0.4}
-                            stroke="var(--color-expected)"
+                            stroke="#1eaedb"
                             strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                         />
                     </AreaChart>
                 </ChartContainer>
             </div>
             <div className="flex w-full items-start gap-2 text-sm">
                 <div className="grid gap-2">
-                    <div className="flex items-center gap-2 font-medium leading-none">
+                    <div className={`flex items-center gap-2 font-medium leading-none ${isAhead ? "text-green-500" : "text-red-500"}`}>
                         {isAhead ? "Ahead" : "Behind"} by {Math.abs(Number(progressDiff))}% {isAhead && <TrendingUp className="h-4 w-4" />}
                     </div>
-                    <div className="flex items-center gap-2 leading-none text-muted-foreground">Current Progress: {currentProgress.toFixed(1)}%</div>
+                    <div className="flex items-center gap-2 leading-none">Current Progress: {currentProgress.toFixed(1)}%</div>
                 </div>
             </div>
         </div>
