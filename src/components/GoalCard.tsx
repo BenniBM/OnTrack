@@ -1,0 +1,44 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Goal } from '../types/goal';
+import { calculateActualProgress, calculateExpectedProgress } from '../utils/progressCalculations';
+
+interface GoalCardProps {
+  goal: Goal;
+  onClick: () => void;
+}
+
+export const GoalCard: React.FC<GoalCardProps> = ({ goal, onClick }) => {
+  const actualProgress = calculateActualProgress(goal);
+  const expectedProgress = calculateExpectedProgress(goal);
+  
+  return (
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={onClick}
+    >
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {goal.type === 'task' ? 'Task-based' : 'Numerical'} Goal
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Actual Progress</span>
+            <span>{actualProgress.toFixed(1)}%</span>
+          </div>
+          <Progress value={actualProgress} className="h-2 bg-gray-200" />
+          
+          <div className="flex justify-between text-sm">
+            <span>Expected Progress</span>
+            <span>{expectedProgress.toFixed(1)}%</span>
+          </div>
+          <Progress value={expectedProgress} className="h-2 bg-gray-200" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
