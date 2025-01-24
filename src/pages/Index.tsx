@@ -2,22 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { GoalCard } from '../components/GoalCard';
+import { CreateGoalDialog } from '../components/CreateGoalDialog';
 import { Goal } from '../types/goal';
-import { loadGoals } from '../services/localStorage';
+import { loadGoals, saveGoals } from '../services/localStorage';
 
 const Index = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const storedGoals = loadGoals();
     setGoals(storedGoals);
   }, []);
 
+  const handleGoalCreate = (newGoal: Goal) => {
+    const updatedGoals = [...goals, newGoal];
+    setGoals(updatedGoals);
+    saveGoals(updatedGoals);
+  };
+
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Progress Tracker</h1>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button onClick={() => setDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Add Goal
         </Button>
@@ -41,6 +49,12 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      <CreateGoalDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onGoalCreate={handleGoalCreate}
+      />
     </div>
   );
 };
