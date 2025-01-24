@@ -3,12 +3,17 @@ import { Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { GoalCard } from '../components/GoalCard';
 import { CreateGoalDialog } from '../components/CreateGoalDialog';
+import { ViewGoalDialog } from '../components/ViewGoalDialog';
 import { Goal } from '../types/goal';
-import { loadGoals, saveGoals } from '../services/localStorage';
+import { loadGoals, saveGoals, deleteGoal } from '../services/localStorage';
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const storedGoals = loadGoals();
@@ -19,13 +24,34 @@ const Index = () => {
     const updatedGoals = [...goals, newGoal];
     setGoals(updatedGoals);
     saveGoals(updatedGoals);
+    toast({
+      title: "Goal Created",
+      description: "Your new goal has been created successfully.",
+    });
+  };
+
+  const handleGoalClick = (goal: Goal) => {
+    setSelectedGoal(goal);
+    setViewDialogOpen(true);
+  };
+
+  const handleGoalDelete = (goalId: string) => {
+    const updatedGoals = goals.filter(g => g.id !== goalId);
+    setGoals(updatedGoals);
+    deleteGoal(goalId);
+    setViewDialogOpen(false);
+    toast({
+      title: "Goal Deleted",
+      description: "The goal has been deleted successfully.",
+      variant: "destructive",
+    });
   };
 
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Progress Tracker</h1>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Add Goal
         </Button>
@@ -36,7 +62,7 @@ const Index = () => {
           <GoalCard
             key={goal.id}
             goal={goal}
-            onClick={() => console.log('Goal clicked:', goal.id)}
+            onClick={() => handleGoalClick(goal)}
           />
         ))}
         
@@ -51,10 +77,19 @@ const Index = () => {
       </div>
 
       <CreateGoalDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
         onGoalCreate={handleGoalCreate}
       />
+
+      {selectedGoal && (
+        <ViewGoalDialog
+          goal={selectedGoal}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+          onDelete={handleGoalDelete}
+        />
+      )}
     </div>
   );
 };
