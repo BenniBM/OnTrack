@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -15,7 +15,8 @@ const formSchema = z.object({
     }),
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().min(1, "End date is required"),
-    targetValue: z.string().min(1, "Target value is required"),
+    startValue: z.string().min(1, "Start value is required"),
+    endValue: z.string().min(1, "End value is required"),
 });
 
 type GoalFormData = z.infer<typeof formSchema>;
@@ -34,19 +35,23 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
             type: "numerical",
             startDate: new Date().toISOString().split("T")[0],
             endDate: "",
-            targetValue: "100",
+            startValue: "0",
+            endValue: "100",
         },
     });
 
     const onSubmit = (data: GoalFormData) => {
+        const targetValue = Number(data.endValue) - Number(data.startValue);
         const newGoal: Goal = {
             id: crypto.randomUUID(),
             title: data.title,
             type: "numerical",
             startDate: data.startDate,
             endDate: data.endDate,
-            currentValue: 0,
-            targetValue: Number(data.targetValue),
+            currentValue: Number(data.startValue),
+            startValue: Number(data.startValue),
+            endValue: Number(data.endValue),
+            targetValue: targetValue,
             subtasks: undefined,
             progressLogs: [],
         };
@@ -109,19 +114,35 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                             />
                         </div>
 
-                        <FormField
-                            control={form.control}
-                            name="targetValue"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Target Value</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="startValue"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Start Value</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" {...field} placeholder="Start Value" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="endValue"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>End Value</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" {...field} placeholder="End Value" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
                         <Button type="submit" className="w-full">
                             Create Goal
