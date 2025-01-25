@@ -27,7 +27,7 @@ const calculateLinearExpectedProgress = (currentDate: Date, startDate: Date, end
     return startValue + progress * (endValue - startValue);
 };
 
-const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"]) => {
+const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"], startValue: number) => {
     // Sort logs by timestamp in ascending order
     const sortedLogs = [...progressLogs].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
@@ -40,7 +40,7 @@ const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"])
         return prev;
     }, null);
 
-    return lastValidLog ? lastValidLog.value : 0;
+    return lastValidLog ? lastValidLog.value : startValue;
 };
 
 export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
@@ -53,11 +53,11 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
         return {
             date: format(currentDate, "MMM dd"),
             expected: calculateLinearExpectedProgress(currentDate, startDate, endDate, goal.startValue, goal.endValue),
-            actual: getProgressValueForDate(currentDate, goal.progressLogs || []),
+            actual: getProgressValueForDate(currentDate, goal.progressLogs || [], goal.startValue),
         };
     });
 
-    const currentProgress = getProgressValueForDate(new Date(), goal.progressLogs || []);
+    const currentProgress = getProgressValueForDate(new Date(), goal.progressLogs || [], goal.startValue);
     const expectedProgress = calculateLinearExpectedProgress(new Date(), startDate, endDate, goal.startValue, goal.endValue);
     const progressDiff = (currentProgress - expectedProgress).toFixed(1);
     const isAhead = currentProgress > expectedProgress;
