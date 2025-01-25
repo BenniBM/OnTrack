@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 const Index = () => {
     const [goals, setGoals] = useState<Goal[]>([]);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
-    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -19,15 +19,14 @@ const Index = () => {
     }, []);
 
     useEffect(() => {
-        const handleBeforeInstallPrompt = (event: BeforeInstallPromptEvent) => {
-            event.preventDefault(); // Prevent the mini-info bar from appearing on mobile
+        const handleBeforeInstallPrompt = (event) => {
             setDeferredPrompt(event); // Stash the event so it can be triggered later.
         };
 
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
         return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
         };
     }, []);
 
@@ -45,10 +44,10 @@ const Index = () => {
         if (deferredPrompt) {
             deferredPrompt.prompt(); // Show the install prompt
             deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the A2HS prompt');
+                if (choiceResult.outcome === "accepted") {
+                    console.log("User accepted the A2HS prompt");
                 } else {
-                    console.log('User dismissed the A2HS prompt');
+                    console.log("User dismissed the A2HS prompt");
                 }
                 setDeferredPrompt(null); // Clear the prompt
             });
@@ -64,11 +63,7 @@ const Index = () => {
                         <Plus className="mr-2 h-4 w-4" />
                         Add Goal
                     </Button>
-                    {deferredPrompt && (
-                        <Button onClick={handleInstallClick}>
-                            Install App
-                        </Button>
-                    )}
+                    {deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}
                 </div>
             </div>
 

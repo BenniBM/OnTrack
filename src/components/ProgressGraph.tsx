@@ -71,7 +71,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
             <div className="text-left">
                 <h2 className="text-2xl font-semibold">Progress Overview</h2>
                 <p className="text-sm mb-8 text-muted-foreground">
-                    Progress from {format(startDate, "PP")} to {format(endDate, "PP")}
+                    {format(startDate, "PP")} to {format(endDate, "PP")}
                 </p>
             </div>
             <div className="relative -mx-4">
