@@ -20,10 +20,11 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-const calculateLinearExpectedProgress = (currentDate: Date, startDate: Date, endDate: Date) => {
+const calculateLinearExpectedProgress = (currentDate: Date, startDate: Date, endDate: Date, startValue: number, endValue: number) => {
     const totalDuration = differenceInMilliseconds(endDate, startDate);
     const currentDuration = differenceInMilliseconds(currentDate, startDate);
-    return Math.min(100, Math.max(0, (currentDuration / totalDuration) * 100));
+    const progress = Math.min(1, Math.max(0, currentDuration / totalDuration));
+    return startValue + progress * (endValue - startValue);
 };
 
 const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"]) => {
@@ -51,13 +52,13 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
         const currentDate = addDays(startDate, index);
         return {
             date: format(currentDate, "MMM dd"),
-            expected: calculateLinearExpectedProgress(currentDate, startDate, endDate),
+            expected: calculateLinearExpectedProgress(currentDate, startDate, endDate, goal.startValue, goal.endValue),
             actual: getProgressValueForDate(currentDate, goal.progressLogs || []),
         };
     });
 
     const currentProgress = getProgressValueForDate(new Date(), goal.progressLogs || []);
-    const expectedProgress = calculateLinearExpectedProgress(new Date(), startDate, endDate);
+    const expectedProgress = calculateLinearExpectedProgress(new Date(), startDate, endDate, goal.startValue, goal.endValue);
     const progressDiff = (currentProgress - expectedProgress).toFixed(1);
     const isAhead = currentProgress > expectedProgress;
 
@@ -81,7 +82,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                         }}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                        <YAxis domain={[0, 100]} hide={false} tickLine={false} axisLine={false} tickMargin={4} width={32} />
+                        <YAxis domain={[goal.startValue, goal.endValue]} hide={false} tickLine={false} axisLine={false} tickMargin={4} width={32} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <defs>
                             <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
