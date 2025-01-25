@@ -124,10 +124,10 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
             <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="grid gap-2 border rounded-lg md:p-4 p-3">
                     <div className={`flex items-center gap-2 font-medium leading-none ${isAhead ? "text-green-500" : "text-red-500"}`}>
-                        {Math.abs(Number(progressDiff))} kg {isAhead && <TrendingUp className="h-4 w-4" />}
+                        {Math.abs(Number(progressDiff))} {isAhead && <TrendingUp className="h-4 w-4" />}
                     </div>
                     <div>
-                        <div className="text-left text-2xl">{currentProgress.toFixed(1)} kg</div>
+                        <div className="text-left text-2xl">{currentProgress.toFixed(1)}</div>
                         <div className="flex items-center gap-2 text-bold leading-none text-muted-foreground">Current Progress</div>
                     </div>
                 </div>
