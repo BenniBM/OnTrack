@@ -95,21 +95,21 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                             </linearGradient>
                         </defs>
                         <Area
-                            dataKey="actual"
-                            type="stepAfter"
-                            fill="url(#fillActual)"
-                            fillOpacity={0.4}
-                            stroke={isAhead ? "#22c55e" : "#ef4444"}
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                        <Area
                             dataKey="expected"
                             type="monotone"
                             fill="url(#fillExpected)"
                             fillOpacity={0.4}
                             stroke="#1eaedb"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                        <Area
+                            dataKey="actual"
+                            type="basis"
+                            fill="url(#fillActual)"
+                            fillOpacity={0.4}
+                            stroke={isAhead ? "#22c55e" : "#ef4444"}
                             strokeWidth={2}
                             strokeLinecap="round"
                             strokeLinejoin="round"
