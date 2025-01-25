@@ -119,7 +119,7 @@ const GoalPage = () => {
         <div className="container py-4 px-0 md:py-8 max-w-4xl mx-auto">
             <div className="px-4 md:px-8">
                 <div className="flex justify-between items-center">
-                    <Button variant="ghost" onClick={() => navigate("/")} className="pl-0">
+                    <Button variant="ghost" onClick={() => navigate("/")} className="pl-0 hover:bg-transparent hover:text-muted-foreground">
                         <ArrowLeft className="h-4 w-4" />
                         Back
                     </Button>
