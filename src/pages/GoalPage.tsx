@@ -21,7 +21,10 @@ const GoalPage = () => {
 
     const goals = loadGoals();
     const goal = goals.find((g) => g.id === id);
-    const [progressValue, setProgressValue] = useState<number>(goal.currentValue);
+    const progressValue = ((goal.currentValue - goal.startValue) / (goal.endValue - goal.startValue)) * 100;
+    const actualValue = goal.startValue + (progressValue / 100) * (goal.endValue - goal.startValue);
+    const [progressValueState, setProgressValue] = useState<number>(progressValue);
+    const [actualValueState, setActualValue] = useState<number>(actualValue);
 
     if (!goal) {
         navigate("/");
@@ -58,18 +61,18 @@ const GoalPage = () => {
         window.location.reload();
     };
 
-    const handleLogProgress = () => {
+    const handleLogProgress = (value: number) => {
         const updatedGoals = goals.map((g) => {
             if (g.id === goal.id) {
                 return {
                     ...g,
-                    currentValue: progressValue,
+                    currentValue: value,
                     progressLogs: [
                         ...(g.progressLogs || []),
                         {
                             id: crypto.randomUUID(),
                             timestamp: new Date().toISOString(),
-                            value: progressValue,
+                            value,
                         },
                     ],
                 };
@@ -105,6 +108,11 @@ const GoalPage = () => {
             variant: "destructive",
         });
         navigate("/");
+    };
+
+    const handleSliderChange = (value: number) => {
+        setProgressValue(value);
+        setActualValue(goal.startValue + (value / 100) * (goal.endValue - goal.startValue));
     };
 
     return (
@@ -153,24 +161,25 @@ const GoalPage = () => {
                 <ProgressGraph goal={goal} />
 
                 <div className="mt-20">
-                    <div className="text-left">
+                    <div className="flex justify-between items-end mb-4 text-left">
                         <h2 className="text-2xl font-semibold">Log Progress</h2>
+                        <span className="text-sm text-muted-foreground">
+                            {progressValueState.toFixed(1)}% | {actualValueState.toFixed(1)}
+                        </span>
                     </div>
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span>Current Progress</span>
-                                <span>{progressValue}%</span>
-                            </div>
                             <Slider
-                                value={[progressValue]}
-                                onValueChange={(value) => setProgressValue(value[0])}
+                                value={[progressValueState]}
+                                onValueChange={(value) => handleSliderChange(value[0])}
                                 max={100}
                                 step={1}
                                 className="w-full"
                             />
                         </div>
-                        <Button onClick={handleLogProgress} className="w-full">
+                        <Button
+                            onClick={() => handleLogProgress(goal.startValue + (progressValueState / 100) * (goal.endValue - goal.startValue))}
+                            className="w-full">
                             Save Progress
                         </Button>
                     </div>
