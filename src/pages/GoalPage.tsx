@@ -118,44 +118,44 @@ const GoalPage = () => {
     return (
         <div className="container py-4 px-0 md:py-8 max-w-4xl mx-auto">
             <div className="px-4 md:px-8">
-                <Button variant="ghost" onClick={() => navigate("/")} className="mb-4 md:mb-6">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Dashboard
-                </Button>
+                <div className="flex justify-between items-center">
+                    <Button variant="ghost" onClick={() => navigate("/")} className="pl-0">
+                        <ArrowLeft className="h-4 w-4" />
+                        Back
+                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline">
+                                <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
+                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogTitle>Confirm Deletion</DialogTitle>
+                                    <DialogDescription>Are you sure you want to delete this goal? This action cannot be undone.</DialogDescription>
+                                    <DialogFooter>
+                                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button variant="destructive" onClick={handleDelete}>
+                                            Delete
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
                 <div className="space-y-4 md:space-y-6">
-                    <div className="flex flex-row text-left justify-between items-center gap-2 mb-12">
+                    <div className="flex flex-row text-left justify-between items-center gap-2 my-8">
                         <h1 className="text-3xl md:text-3xl font-bold">{goal.title}</h1>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline">
-                                    <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
-                                            <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <DialogTitle>Confirm Deletion</DialogTitle>
-                                        <DialogDescription>
-                                            Are you sure you want to delete this goal? This action cannot be undone.
-                                        </DialogDescription>
-                                        <DialogFooter>
-                                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                                Cancel
-                                            </Button>
-                                            <Button variant="destructive" onClick={handleDelete}>
-                                                Delete
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
                 </div>
                 <ProgressGraph goal={goal} />
