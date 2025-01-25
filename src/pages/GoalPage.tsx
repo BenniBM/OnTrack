@@ -117,7 +117,7 @@ const GoalPage = () => {
 
                 <div className="space-y-4 md:space-y-6">
                     <div className="flex flex-row text-left justify-between items-center gap-2 mb-12">
-                        <h1 className="text-2xl md:text-3xl font-bold">{goal.title}</h1>
+                        <h1 className="text-3xl md:text-3xl font-bold">{goal.title}</h1>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline">
@@ -160,7 +160,7 @@ const GoalPage = () => {
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span>Current Progress</span>
-                                <span>{progressValue === 0 ? goal.currentValue : progressValue}%</span>
+                                <span>{progressValue}%</span>
                             </div>
                             <Slider
                                 value={[progressValue]}
