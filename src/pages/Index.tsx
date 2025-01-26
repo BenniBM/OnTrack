@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GoalCard } from "../components/GoalCard";
 import { CreateGoalDialog } from "../components/CreateGoalDialog";
 import { Goal } from "../types/goal";
 import { loadGoals, saveGoals } from "../services/localStorage";
 import { useToast } from "@/components/ui/use-toast";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Index = () => {
     const [goals, setGoals] = useState<Goal[]>([]);
@@ -21,11 +22,9 @@ const Index = () => {
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (event) => {
-            setDeferredPrompt(event); // Stash the event so it can be triggered later.
+            setDeferredPrompt(event);
         };
-
         window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
         return () => {
             window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
         };
@@ -43,17 +42,21 @@ const Index = () => {
 
     const handleInstallClick = () => {
         if (deferredPrompt) {
-            deferredPrompt.prompt(); // Show the install prompt
+            deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === "accepted") {
                     console.log("User accepted the A2HS prompt");
                 } else {
                     console.log("User dismissed the A2HS prompt");
                 }
-                setDeferredPrompt(null); // Clear the prompt
+                setDeferredPrompt(null);
             });
         }
     };
+
+    // Separate active and completed goals
+    const activeGoals = goals.filter((goal) => goal.currentValue < goal.endValue);
+    const completedGoals = goals.filter((goal) => goal.currentValue >= goal.endValue);
 
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
@@ -68,18 +71,39 @@ const Index = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {goals.map((goal) => (
+            {/* Active Goals Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+                {activeGoals.map((goal) => (
                     <GoalCard key={goal.id} goal={goal} />
                 ))}
-
-                {goals.length === 0 && (
+                {activeGoals.length === 0 && (
                     <div className="col-span-full text-center py-8 md:py-12">
-                        <h2 className="text-lg md:text-xl font-semibold mb-2">No goals yet</h2>
-                        <p className="text-muted-foreground">Create your first goal to start tracking your progress!</p>
+                        <h2 className="text-lg md:text-xl font-semibold mb-2">No active goals</h2>
+                        <p className="text-muted-foreground">Create a goal to start tracking your progress!</p>
                     </div>
                 )}
             </div>
+
+            {/* Completed Goals Accordion */}
+            {completedGoals.length > 0 && (
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="completed-goals">
+                        <AccordionTrigger>
+                            <div className="flex items-center">
+                                <Check className="mr-2 h-4 w-4" />
+                                <span className="no-underline">Completed Goals</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                                {completedGoals.map((goal) => (
+                                    <GoalCard key={goal.id} goal={goal} />
+                                ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            )}
 
             <CreateGoalDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onGoalCreate={handleGoalCreate} />
         </div>
