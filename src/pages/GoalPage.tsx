@@ -165,25 +165,9 @@ const GoalPage = () => {
                                 }}>
                                 <Edit2 className="mr-2 h-4 w-4" /> Edit Goal
                             </DropdownMenuItem>
-                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
-                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
-                                    </DropdownMenuItem>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogTitle>Confirm Deletion</DialogTitle>
-                                    <DialogDescription>Are you sure you want to delete this goal? This action cannot be undone.</DialogDescription>
-                                    <DialogFooter>
-                                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                            Cancel
-                                        </Button>
-                                        <Button variant="destructive" onClick={handleDelete}>
-                                            Delete
-                                        </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
+                            <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
+                            </DropdownMenuItem>
                             {/* <DropdownMenuItem onClick={() => {}}>
                                 <Download className="mr-2 h-4 w-4" /> Export CSV
                             </DropdownMenuItem> */}
@@ -271,6 +255,20 @@ const GoalPage = () => {
                     </Accordion>
                 )}
             </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogDescription>Are you sure you want to delete this goal? This action cannot be undone.</DialogDescription>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <CreateGoalDialog
                 update={true}
                 existingGoal={goal}
