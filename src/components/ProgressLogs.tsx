@@ -22,11 +22,11 @@ export const ProgressLogs: React.FC<ProgressLogsProps> = ({ goal, onUpdateLogs }
         };
 
         onUpdateLogs(updatedGoal);
-        toast({
-            title: "Log Deleted",
-            description: "Progress log has been removed.",
-            variant: "destructive",
-        });
+        // toast({
+        //     title: "Log Deleted",
+        //     description: "Progress log has been removed.",
+        //     variant: "destructive",
+        // });
     };
 
     const handleStartEdit = (log: Goal["progressLogs"][0]) => {
@@ -52,10 +52,10 @@ export const ProgressLogs: React.FC<ProgressLogsProps> = ({ goal, onUpdateLogs }
 
         onUpdateLogs(updatedGoal);
         setEditingLogId(null);
-        toast({
-            title: "Log Updated",
-            description: "Progress log has been updated.",
-        });
+        // toast({
+        //     title: "Log Updated",
+        //     description: "Progress log has been updated.",
+        // });
     };
 
     return (
