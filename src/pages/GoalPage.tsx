@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
-import { ArrowLeft, Check, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Download, Edit, Edit2, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -16,6 +16,7 @@ import Confetti from "react-canvas-confetti/dist/presets/realistic";
 import { TConductorInstance, TPresetInstanceProps } from "react-canvas-confetti/dist/types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProgressLogs } from "@/components/ProgressLogs";
+import { CreateGoalDialog } from "@/components/CreateGoalDialog";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -30,6 +31,7 @@ const GoalPage = () => {
     const [progressValueState, setProgressValue] = useState<number>(progressValue);
     const [actualValueState, setActualValue] = useState<number>(actualValue);
     const [subtasks, setSubtasks] = useState<Subtask[]>(goal.subtasks || []);
+    const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
 
     const confettiRef = useRef<TConductorInstance | null>(null);
 
@@ -135,6 +137,12 @@ const GoalPage = () => {
         confettiRef.current = conductor;
     };
 
+    const handleGoatUpdate = (updatedGoal: Goal) => {
+        const updatedGoals = goals.map((g) => (g.id === goal.id ? updatedGoal : g));
+        saveGoals(updatedGoals);
+        setGoals(updatedGoals);
+    };
+
     return (
         <div className="container py-4 px-0 md:py-8 max-w-4xl mx-auto">
             <Confetti onInit={handleConfettiInit} width={window.innerWidth} height={window.innerHeight}></Confetti>
@@ -151,11 +159,17 @@ const GoalPage = () => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    setUpdateDialogOpen(true);
+                                }}>
+                                <Edit2 className="mr-2 h-4 w-4" /> Edit Goal
+                            </DropdownMenuItem>
                             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                 <DialogTrigger asChild>
-                                    <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
+                                    <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
                                         <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
-                                    </Button>
+                                    </DropdownMenuItem>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogTitle>Confirm Deletion</DialogTitle>
@@ -170,6 +184,9 @@ const GoalPage = () => {
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
+                            <DropdownMenuItem onClick={() => {}}>
+                                <Download className="mr-2 h-4 w-4" /> Export CSV
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -254,6 +271,13 @@ const GoalPage = () => {
                     </Accordion>
                 )}
             </div>
+            <CreateGoalDialog
+                update={true}
+                existingGoal={goal}
+                open={updateDialogOpen}
+                onOpenChange={setUpdateDialogOpen}
+                onGoalCreate={handleGoatUpdate}
+            />
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -25,36 +25,72 @@ interface CreateGoalDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onGoalCreate: (goal: Goal) => void;
+    update?: boolean;
+    existingGoal?: Goal;
 }
 
-export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpenChange, onGoalCreate }) => {
+export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpenChange, onGoalCreate, update = false, existingGoal }) => {
     const form = useForm<GoalFormData>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            title: "",
-            type: "numerical",
-            startDate: new Date().toISOString().split("T")[0],
-            endDate: "",
-            startValue: "0",
-            endValue: "100",
-        },
+        defaultValues:
+            update && existingGoal
+                ? {
+                      title: existingGoal.title,
+                      type: existingGoal.type,
+                      startDate: existingGoal.startDate,
+                      endDate: existingGoal.endDate,
+                      startValue: existingGoal.startValue.toString(),
+                      endValue: existingGoal.endValue.toString(),
+                  }
+                : {
+                      title: "",
+                      type: "numerical",
+                      startDate: new Date().toISOString().split("T")[0],
+                      endDate: "",
+                      startValue: "0",
+                      endValue: "100",
+                  },
     });
+
+    useEffect(() => {
+        if (update && existingGoal) {
+            form.reset({
+                title: existingGoal.title,
+                type: existingGoal.type,
+                startDate: existingGoal.startDate,
+                endDate: existingGoal.endDate,
+                startValue: existingGoal.startValue.toString(),
+                endValue: existingGoal.endValue.toString(),
+            });
+        }
+    }, [update, existingGoal, form]);
 
     const onSubmit = (data: GoalFormData) => {
         const targetValue = Number(data.endValue) - Number(data.startValue);
-        const newGoal: Goal = {
-            id: crypto.randomUUID(),
-            title: data.title,
-            type: "numerical",
-            startDate: data.startDate,
-            endDate: data.endDate,
-            currentValue: Number(data.startValue),
-            startValue: Number(data.startValue),
-            endValue: Number(data.endValue),
-            targetValue: targetValue,
-            subtasks: undefined,
-            progressLogs: [],
-        };
+        const newGoal: Goal =
+            update && existingGoal
+                ? {
+                      ...existingGoal,
+                      title: data.title,
+                      startDate: data.startDate,
+                      endDate: data.endDate,
+                      startValue: Number(data.startValue),
+                      endValue: Number(data.endValue),
+                      targetValue: targetValue,
+                  }
+                : {
+                      id: crypto.randomUUID(),
+                      title: data.title,
+                      type: "numerical",
+                      startDate: data.startDate,
+                      endDate: data.endDate,
+                      currentValue: Number(data.startValue),
+                      startValue: Number(data.startValue),
+                      endValue: Number(data.endValue),
+                      targetValue: targetValue,
+                      subtasks: undefined,
+                      progressLogs: [],
+                  };
 
         onGoalCreate(newGoal);
         form.reset();
@@ -65,7 +101,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className="text-2xl">Create New Goal</DialogTitle>
+                    <DialogTitle className="text-2xl">{update ? "Update Goal" : "Create New Goal"}</DialogTitle>
                 </DialogHeader>
 
                 <Form {...form}>
@@ -145,7 +181,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                         </div>
 
                         <Button type="submit" className="w-full">
-                            Create Goal
+                            {update ? "Update Goal" : "Create Goal"}
                         </Button>
                     </form>
                 </Form>
