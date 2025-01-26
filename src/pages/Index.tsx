@@ -7,6 +7,7 @@ import { Goal } from "../types/goal";
 import { loadGoals, saveGoals } from "../services/localStorage";
 import { useToast } from "@/components/ui/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { calculateActualProgress, calculateExpectedProgress } from "@/utils/progressCalculations";
 
 const Index = () => {
     const [goals, setGoals] = useState<Goal[]>([]);
@@ -16,7 +17,16 @@ const Index = () => {
 
     useEffect(() => {
         const storedGoals = loadGoals();
-        storedGoals.sort((a, b) => a.currentValue - b.currentValue);
+        storedGoals.sort((a, b) => {
+            const expectedProgressA = calculateExpectedProgress(a);
+            const expectedProgressB = calculateExpectedProgress(b);
+            const actualProgressA = calculateActualProgress(a);
+            const actualProgressB = calculateActualProgress(b);
+            const deltaA = expectedProgressA - actualProgressA;
+            const deltaB = expectedProgressB - actualProgressB;
+            if (deltaA < deltaB) return 1;
+            if (deltaA > deltaB) return -1;
+        });
         setGoals(storedGoals);
     }, []);
 
