@@ -15,6 +15,7 @@ const Index = () => {
 
     useEffect(() => {
         const storedGoals = loadGoals();
+        storedGoals.sort((a, b) => a.currentValue - b.currentValue);
         setGoals(storedGoals);
     }, []);
 
