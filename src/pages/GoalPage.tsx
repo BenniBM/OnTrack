@@ -20,13 +20,14 @@ const GoalPage = () => {
     const navigate = useNavigate();
     const [newTask, setNewTask] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const goals = loadGoals();
+    const [goals, setGoals] = useState(loadGoals());
     const goal = goals.find((g) => g.id === id);
+
     const progressValue = ((goal.currentValue - goal.startValue) / (goal.endValue - goal.startValue)) * 100;
     const actualValue = goal.startValue + (progressValue / 100) * (goal.endValue - goal.startValue);
     const [progressValueState, setProgressValue] = useState<number>(progressValue);
     const [actualValueState, setActualValue] = useState<number>(actualValue);
+    const [subtasks, setSubtasks] = useState<Subtask[]>(goal.subtasks || []);
 
     const confettiRef = useRef<TConductorInstance | null>(null);
 
@@ -39,75 +40,71 @@ const GoalPage = () => {
         e.preventDefault();
         if (!newTask.trim()) return;
 
-        const updatedGoals = goals.map((g) => {
-            if (g.id === goal.id) {
-                return {
-                    ...g,
-                    subtasks: [
-                        ...(g.subtasks || []),
-                        {
-                            id: crypto.randomUUID(),
-                            title: newTask,
-                            completed: false,
-                        },
-                    ],
-                };
-            }
-            return g;
-        });
+        const newSubtask = {
+            id: crypto.randomUUID(),
+            title: newTask,
+            completed: false,
+        };
+
+        const updatedSubtasks = [...subtasks, newSubtask];
+        setSubtasks(updatedSubtasks);
+
+        const updatedGoals = goals.map((g) => (g.id === goal.id ? { ...g, subtasks: updatedSubtasks } : g));
 
         saveGoals(updatedGoals);
+        setGoals(updatedGoals);
         setNewTask("");
         toast({
             title: "Task Added",
             description: "New task has been added successfully.",
         });
-        window.location.reload();
     };
 
     const handleLogProgress = (value: number) => {
         const updatedGoals = goals.map((g) => {
             if (g.id === goal.id) {
+                const updatedProgressLogs = [
+                    ...(g.progressLogs || []),
+                    {
+                        id: crypto.randomUUID(),
+                        timestamp: new Date().toISOString(),
+                        value,
+                    },
+                ];
+
+                if (value === goal.endValue) {
+                    triggerConfetti();
+                }
+
                 return {
                     ...g,
                     currentValue: value,
-                    progressLogs: [
-                        ...(g.progressLogs || []),
-                        {
-                            id: crypto.randomUUID(),
-                            timestamp: new Date().toISOString(),
-                            value,
-                        },
-                    ],
+                    progressLogs: updatedProgressLogs,
                 };
             }
             return g;
         });
 
         saveGoals(updatedGoals);
+        setGoals(updatedGoals);
+
         if (value === goal.endValue) {
-            triggerConfetti();
             setTimeout(() => {
-                window.location.reload();
+                const finalGoals = loadGoals();
+                setGoals(finalGoals);
             }, 3000);
-        } else {
-            window.location.reload();
         }
     };
 
     const toggleTask = (taskId: string) => {
-        const updatedGoals = goals.map((g) => {
-            if (g.id === goal.id) {
-                return {
-                    ...g,
-                    subtasks: g.subtasks?.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task)),
-                };
-            }
-            return g;
-        });
+        const updatedSubtasks = subtasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task));
+
+        setSubtasks(updatedSubtasks);
+
+        const updatedGoals = goals.map((g) => (g.id === goal.id ? { ...g, subtasks: updatedSubtasks } : g));
 
         saveGoals(updatedGoals);
-        window.location.reload();
+        setGoals(updatedGoals);
     };
 
     const handleDelete = () => {
@@ -216,7 +213,7 @@ const GoalPage = () => {
                             </Button>
                         </form>
                         <div className="space-y-2">
-                            {goal.subtasks?.map((task: Subtask) => (
+                            {subtasks.map((task: Subtask) => (
                                 <div
                                     key={task.id}
                                     className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
