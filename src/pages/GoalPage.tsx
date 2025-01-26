@@ -184,9 +184,9 @@ const GoalPage = () => {
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-                            <DropdownMenuItem onClick={() => {}}>
+                            {/* <DropdownMenuItem onClick={() => {}}>
                                 <Download className="mr-2 h-4 w-4" /> Export CSV
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
