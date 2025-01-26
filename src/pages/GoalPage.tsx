@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
-import { ArrowLeft, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -14,6 +14,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import Confetti from "react-canvas-confetti/dist/presets/realistic";
 import { TConductorInstance, TPresetInstanceProps } from "react-canvas-confetti/dist/types";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ProgressLogs } from "@/components/ProgressLogs";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -63,14 +65,16 @@ const GoalPage = () => {
     const handleLogProgress = (value: number) => {
         const updatedGoals = goals.map((g) => {
             if (g.id === goal.id) {
-                const updatedProgressLogs = [
-                    ...(g.progressLogs || []),
-                    {
-                        id: crypto.randomUUID(),
-                        timestamp: new Date().toISOString(),
-                        value,
-                    },
-                ];
+                const today = new Date().toISOString().split("T")[0];
+                const updatedProgressLogs = g.progressLogs?.filter((log) => new Date(log.timestamp).toISOString().split("T")[0] !== today) || [];
+
+                const newLog = {
+                    id: crypto.randomUUID(),
+                    timestamp: new Date().toISOString(),
+                    value,
+                };
+
+                updatedProgressLogs.push(newLog);
 
                 if (value === goal.endValue) {
                     triggerConfetti();
@@ -224,6 +228,30 @@ const GoalPage = () => {
                             ))}
                         </div>
                     </Card>
+                )}
+
+                {/* Completed Goals Accordion */}
+                {goal.progressLogs.length > 0 && (
+                    <Accordion type="single" collapsible className="mt-6 w-full">
+                        <AccordionItem value="completed-goals">
+                            <AccordionTrigger>
+                                <div className="flex items-center">
+                                    <History className="mr-2 h-4 w-4" />
+                                    <span className="no-underline">Progress Logs</span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <ProgressLogs
+                                    goal={goal}
+                                    onUpdateLogs={(updatedGoal) => {
+                                        const updatedGoals = goals.map((g) => (g.id === goal.id ? updatedGoal : g));
+                                        saveGoals(updatedGoals);
+                                        setGoals(updatedGoals);
+                                    }}
+                                />
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 )}
             </div>
         </div>
