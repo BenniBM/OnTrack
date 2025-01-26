@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ArrowLeft, MoreHorizontal, Plus, Trash2 } from "lucide-react";
@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import Confetti from "react-canvas-confetti/dist/presets/realistic";
+import { TConductorInstance, TPresetInstanceProps } from "react-canvas-confetti/dist/types";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -25,6 +27,8 @@ const GoalPage = () => {
     const actualValue = goal.startValue + (progressValue / 100) * (goal.endValue - goal.startValue);
     const [progressValueState, setProgressValue] = useState<number>(progressValue);
     const [actualValueState, setActualValue] = useState<number>(actualValue);
+
+    const confettiRef = useRef<TConductorInstance | null>(null);
 
     if (!goal) {
         navigate("/");
@@ -81,7 +85,14 @@ const GoalPage = () => {
         });
 
         saveGoals(updatedGoals);
-        window.location.reload();
+        if (value === goal.endValue) {
+            triggerConfetti();
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+        } else {
+            window.location.reload();
+        }
     };
 
     const toggleTask = (taskId: string) => {
@@ -115,8 +126,17 @@ const GoalPage = () => {
         setActualValue(goal.startValue + (value / 100) * (goal.endValue - goal.startValue));
     };
 
+    const triggerConfetti = () => {
+        confettiRef.current?.shoot();
+    };
+
+    const handleConfettiInit: TPresetInstanceProps["onInit"] = ({ conductor }) => {
+        confettiRef.current = conductor;
+    };
+
     return (
         <div className="container py-4 px-0 md:py-8 max-w-4xl mx-auto">
+            <Confetti onInit={handleConfettiInit} width={window.innerWidth} height={window.innerHeight}></Confetti>
             <div className="px-4 md:px-8">
                 <div className="flex justify-between items-center">
                     <Button variant="ghost" onClick={() => navigate("/")} className="pl-0 hover:bg-transparent hover:text-muted-foreground">
