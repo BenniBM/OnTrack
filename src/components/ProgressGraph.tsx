@@ -1,6 +1,6 @@
 import React from "react";
 import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "recharts";
 import { Goal } from "../types/goal";
 import { differenceInDays, addDays, format, differenceInMilliseconds, isAfter, isBefore, isEqual } from "date-fns";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -29,10 +29,8 @@ const calculateLinearExpectedProgress = (currentDate: Date, startDate: Date, end
 };
 
 const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"], startValue: number) => {
-    // Sort logs by timestamp in ascending order
     const sortedLogs = [...progressLogs].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
-    // Find the last log entry that's before or equal to the given date
     const lastValidLog = sortedLogs.reduce((prev, curr) => {
         const currDate = new Date(curr.timestamp);
         if ((isEqual(currDate, date) || isBefore(currDate, date)) && (!prev || isAfter(currDate, new Date(prev.timestamp)))) {
@@ -47,12 +45,14 @@ const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"],
 export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
     const startDate = new Date(goal.startDate);
     const endDate = new Date(goal.endDate);
+    const currentDate = new Date();
     const totalDays = differenceInDays(endDate, startDate);
 
     const data = Array.from({ length: totalDays + 1 }, (_, index) => {
         const currentDate = addDays(startDate, index);
         return {
             date: format(currentDate, "MMM dd"),
+            fullDate: currentDate,
             expected: calculateLinearExpectedProgress(currentDate, startDate, endDate, goal.startValue, goal.endValue),
             actual: getProgressValueForDate(currentDate, goal.progressLogs || [], goal.startValue),
         };
@@ -118,6 +118,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                         />
+                        <ReferenceLine x={format(currentDate, "MMM dd")} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
                     </AreaChart>
                 </ChartContainer>
             </div>
