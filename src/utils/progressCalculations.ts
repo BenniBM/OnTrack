@@ -11,8 +11,9 @@ export const calculateExpectedProgress = (goal: Goal): number => {
 
     const totalDuration = end - start;
     const elapsed = now - start;
-    const expectedProgress = (elapsed / totalDuration) * totalRange;
+    const expectedProgress = goal.startValue + (elapsed / totalDuration) * totalRange;
     const expectedProgressDelta = expectedProgress - goal.startValue;
+    console.log({ expectedProgress, start: goal.startValue, expectedProgressDelta, totalRange });
 
     return (expectedProgressDelta / totalRange) * 100;
 };
