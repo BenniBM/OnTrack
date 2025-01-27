@@ -91,9 +91,9 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                         <YAxis domain={[goal.startValue, goal.endValue]} hide={false} tickLine={false} axisLine={false} tickMargin={4} width={32} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                         <defs>
-                            <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={isAhead ? "#22c55e" : "#ef4444"} stopOpacity={0.8} />
-                                <stop offset="95%" stopColor={isAhead ? "#22c55e" : "#ef4444"} stopOpacity={0.1} />
+                            <linearGradient id="fillActual" x1="0" y1={isDecreasingGoal ? "1" : "0"} x2="0" y2={isDecreasingGoal ? "0" : "1"}>
+                                <stop offset="0%" stopColor={isAhead ? "#22c55e" : "#ef4444"} stopOpacity={0.8} />
+                                <stop offset="100%" stopColor={isAhead ? "#22c55e" : "#ef4444"} stopOpacity={0.1} />
                             </linearGradient>
                         </defs>
                         <Area
@@ -115,6 +115,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                             strokeWidth={2}
                             strokeLinecap="round"
                             strokeLinejoin="round"
+                            baseValue={goal.startValue}
                         />
                         <ReferenceLine x={format(currentDate, "MMM dd")} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
                     </AreaChart>
