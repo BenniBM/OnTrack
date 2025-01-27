@@ -4,31 +4,32 @@ import { Button } from "@/components/ui/button";
 import { GoalCard } from "../components/GoalCard";
 import { CreateGoalDialog } from "../components/CreateGoalDialog";
 import { Goal } from "../types/goal";
-import { loadGoals, saveGoals } from "../services/localStorage";
+import { db } from "../services/storage";
 import { useToast } from "@/components/ui/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { calculateActualProgress, calculateExpectedProgress } from "@/utils/progressCalculations";
+import { useLiveQuery } from "dexie-react-hooks";
 
 const Index = () => {
-    const [goals, setGoals] = useState<Goal[]>([]);
+    const goals = useLiveQuery(() => db.goals.toArray(), []);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const { toast } = useToast();
 
     useEffect(() => {
-        const storedGoals = loadGoals();
-        storedGoals.sort((a, b) => {
-            const expectedProgressA = calculateExpectedProgress(a);
-            const expectedProgressB = calculateExpectedProgress(b);
-            const actualProgressA = calculateActualProgress(a);
-            const actualProgressB = calculateActualProgress(b);
-            const deltaA = expectedProgressA - actualProgressA;
-            const deltaB = expectedProgressB - actualProgressB;
-            if (deltaA < deltaB) return 1;
-            if (deltaA > deltaB) return -1;
-        });
-        setGoals(storedGoals);
-    }, []);
+        if (goals) {
+            goals.sort((a, b) => {
+                const expectedProgressA = calculateExpectedProgress(a);
+                const expectedProgressB = calculateExpectedProgress(b);
+                const actualProgressA = calculateActualProgress(a);
+                const actualProgressB = calculateActualProgress(b);
+                const deltaA = expectedProgressA - actualProgressA;
+                const deltaB = expectedProgressB - actualProgressB;
+                if (deltaA < deltaB) return 1;
+                if (deltaA > deltaB) return -1;
+            });
+        }
+    }, [goals]);
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (event) => {
@@ -40,10 +41,10 @@ const Index = () => {
         };
     }, []);
 
+    if (!goals) return null;
+
     const handleGoalCreate = (newGoal: Goal) => {
-        const updatedGoals = [...goals, newGoal];
-        setGoals(updatedGoals);
-        saveGoals(updatedGoals);
+        db.goals.add(newGoal);
         toast({
             title: "Goal Created",
             description: "Your new goal has been created successfully.",
@@ -67,9 +68,7 @@ const Index = () => {
     // Separate active and completed goals
     const activeGoals = goals.filter((goal) => {
         const isDecreasingGoal = goal.startValue > goal.endValue;
-        return isDecreasingGoal
-            ? goal.currentValue > goal.endValue
-            : goal.currentValue < goal.endValue;
+        return isDecreasingGoal ? goal.currentValue > goal.endValue : goal.currentValue < goal.endValue;
     });
     const completedGoals = goals.filter((goal) => goal.currentValue == goal.endValue);
 

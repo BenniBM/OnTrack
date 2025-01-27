@@ -1,39 +1,50 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { format } from "date-fns";
-import { ArrowLeft, Check, Download, Edit, Edit2, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit2, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Goal, Subtask } from "../types/goal";
-import { loadGoals, saveGoals } from "../services/localStorage";
+import { db } from "../services/storage";
 import { ProgressGraph } from "../components/ProgressGraph";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import Confetti from "react-canvas-confetti/dist/presets/realistic";
 import { TConductorInstance, TPresetInstanceProps } from "react-canvas-confetti/dist/types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProgressLogs } from "@/components/ProgressLogs";
 import { CreateGoalDialog } from "@/components/CreateGoalDialog";
+import { useLiveQuery } from "dexie-react-hooks";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [newTask, setNewTask] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [goals, setGoals] = useState(loadGoals());
-    const goal = goals.find((g) => g.id === id);
+    const goals = useLiveQuery(() => db.goals.toArray(), []);
+    const goal = goals?.find((g) => g.id === id);
+    const [goalState, setGoalState] = useState<Goal | null>(null);
 
-    const progressValue = ((goal.currentValue - goal.startValue) / (goal.endValue - goal.startValue)) * 100;
-    const actualValue = goal.startValue + (progressValue / 100) * (goal.endValue - goal.startValue);
-    const [progressValueState, setProgressValue] = useState<number>(progressValue);
-    const [actualValueState, setActualValue] = useState<number>(actualValue);
-    const [subtasks, setSubtasks] = useState<Subtask[]>(goal.subtasks || []);
+    const [progressValueState, setProgressValue] = useState<number>(0);
+    const [actualValueState, setActualValue] = useState<number>(0);
+    const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
-
     const confettiRef = useRef<TConductorInstance | null>(null);
+
+    useEffect(() => {
+        if (goal) {
+            const progressValue = ((goal.currentValue - goal.startValue) / (goal.endValue - goal.startValue)) * 100;
+            const actualValue = goal.startValue + (progressValue / 100) * (goal.endValue - goal.startValue);
+            setProgressValue(progressValue);
+            setActualValue(actualValue);
+            setSubtasks(goal.subtasks || []);
+            setGoalState(goal);
+        }
+    }, [goal]);
+
+    if (!goals) return null;
 
     if (!goal) {
         navigate("/");
@@ -53,10 +64,12 @@ const GoalPage = () => {
         const updatedSubtasks = [...subtasks, newSubtask];
         setSubtasks(updatedSubtasks);
 
-        const updatedGoals = goals.map((g) => (g.id === goal.id ? { ...g, subtasks: updatedSubtasks } : g));
+        const updatedGoal = {
+            ...goal,
+            subtasks: updatedSubtasks,
+        };
+        db.goals.put(updatedGoal);
 
-        saveGoals(updatedGoals);
-        setGoals(updatedGoals);
         setNewTask("");
         toast({
             title: "Task Added",
@@ -65,41 +78,28 @@ const GoalPage = () => {
     };
 
     const handleLogProgress = (value: number) => {
-        const updatedGoals = goals.map((g) => {
-            if (g.id === goal.id) {
-                const today = new Date().toISOString().split("T")[0];
-                const updatedProgressLogs = g.progressLogs?.filter((log) => new Date(log.timestamp).toISOString().split("T")[0] !== today) || [];
+        const today = new Date().toISOString().split("T")[0];
+        const updatedProgressLogs = goal.progressLogs?.filter((log) => new Date(log.timestamp).toISOString().split("T")[0] !== today) || [];
 
-                const newLog = {
-                    id: crypto.randomUUID(),
-                    timestamp: new Date().toISOString(),
-                    value,
-                };
+        const newLog = {
+            id: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+            value,
+        };
 
-                updatedProgressLogs.push(newLog);
-
-                if (value === goal.endValue) {
-                    triggerConfetti();
-                }
-
-                return {
-                    ...g,
-                    currentValue: value,
-                    progressLogs: updatedProgressLogs,
-                };
-            }
-            return g;
-        });
-
-        saveGoals(updatedGoals);
-        setGoals(updatedGoals);
+        updatedProgressLogs.push(newLog);
 
         if (value === goal.endValue) {
-            setTimeout(() => {
-                const finalGoals = loadGoals();
-                setGoals(finalGoals);
-            }, 3000);
+            triggerConfetti();
         }
+
+        const updatedGoal = {
+            ...goal,
+            currentValue: value,
+            progressLogs: updatedProgressLogs,
+        };
+
+        db.goals.put(updatedGoal);
     };
 
     const toggleTask = (taskId: string) => {
@@ -107,15 +107,16 @@ const GoalPage = () => {
 
         setSubtasks(updatedSubtasks);
 
-        const updatedGoals = goals.map((g) => (g.id === goal.id ? { ...g, subtasks: updatedSubtasks } : g));
+        const updatedGoal = {
+            ...goal,
+            subtasks: updatedSubtasks,
+        };
 
-        saveGoals(updatedGoals);
-        setGoals(updatedGoals);
+        db.goals.put(updatedGoal);
     };
 
     const handleDelete = () => {
-        const updatedGoals = goals.filter((g) => g.id !== goal.id);
-        saveGoals(updatedGoals);
+        db.goals.delete(goal.id);
         toast({
             title: "Goal Deleted",
             description: "The goal has been deleted successfully.",
@@ -137,10 +138,12 @@ const GoalPage = () => {
         confettiRef.current = conductor;
     };
 
-    const handleGoatUpdate = (updatedGoal: Goal) => {
-        const updatedGoals = goals.map((g) => (g.id === goal.id ? updatedGoal : g));
-        saveGoals(updatedGoals);
-        setGoals(updatedGoals);
+    const handleGoalUpdate = (updatedGoal: Goal) => {
+        const updated = {
+            ...goal,
+            ...updatedGoal,
+        };
+        db.goals.put(updated);
     };
 
     return (
@@ -180,7 +183,7 @@ const GoalPage = () => {
                         <h1 className="text-3xl md:text-3xl font-bold">{goal.title}</h1>
                     </div>
                 </div>
-                <ProgressGraph goal={goal} />
+                <ProgressGraph goal={goalState ? goalState : goal} />
 
                 <div className="mt-20">
                     <div className="flex justify-between items-end mb-4 text-left">
@@ -245,9 +248,7 @@ const GoalPage = () => {
                                 <ProgressLogs
                                     goal={goal}
                                     onUpdateLogs={(updatedGoal) => {
-                                        const updatedGoals = goals.map((g) => (g.id === goal.id ? updatedGoal : g));
-                                        saveGoals(updatedGoals);
-                                        setGoals(updatedGoals);
+                                        handleGoalUpdate(updatedGoal);
                                     }}
                                 />
                             </AccordionContent>
@@ -274,7 +275,7 @@ const GoalPage = () => {
                 existingGoal={goal}
                 open={updateDialogOpen}
                 onOpenChange={setUpdateDialogOpen}
-                onGoalCreate={handleGoatUpdate}
+                onGoalCreate={handleGoalUpdate}
             />
         </div>
     );
