@@ -65,8 +65,13 @@ const Index = () => {
     };
 
     // Separate active and completed goals
-    const activeGoals = goals.filter((goal) => goal.currentValue < goal.endValue);
-    const completedGoals = goals.filter((goal) => goal.currentValue >= goal.endValue);
+    const activeGoals = goals.filter((goal) => {
+        const isDecreasingGoal = goal.startValue > goal.endValue;
+        return isDecreasingGoal
+            ? goal.currentValue > goal.endValue
+            : goal.currentValue < goal.endValue;
+    });
+    const completedGoals = goals.filter((goal) => goal.currentValue == goal.endValue);
 
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
