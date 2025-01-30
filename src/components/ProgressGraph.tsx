@@ -129,7 +129,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                     <div>
                         <div className="text-left text-2xl">
                             {currentProgress.toFixed(1)}
-                            {goal.unit ? goal.unit : ""}
+                            {!goal.unit || goal.unit == "none" ? "" : goal.unit}
                         </div>
                         <div className="flex items-center gap-2 text-bold leading-none text-muted-foreground">Current Progress</div>
                     </div>
