@@ -1,69 +1,97 @@
-# Welcome to your Lovable project
+<div align="center">
+  
+# 🎯 OnTrack
 
-## Project info
+[Insert your awesome logo here]
 
-**URL**: https://lovable.dev/projects/2e4154ad-312d-4f0f-9478-50e6f387b9ff
+*Because even procrastinators deserve a progress bar!* 
 
-## How can I edit this code?
+[![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB.svg)](https://reactjs.org/)
 
-There are several ways of editing your application.
+### [Go to OnTrack →](progress-pie.netlify.app)
 
-**Use Lovable**
+</div>
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2e4154ad-312d-4f0f-9478-50e6f387b9ff) and start prompting.
+## 🚀 What's This All About?
 
-Changes made via Lovable will be committed automatically to this repo.
+Ever set a goal and then completely forgot about it until the night before? Yeah, we've all been there. OnTrack is like having a personal coach who's actually good at math – it shows you exactly how far behind (or ahead!) you are on your goals.
 
-**Use your preferred IDE**
+## ✨ Features That'll Make You Go "Wow!"
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- 📊 **Progress Tracking**: Watch your progress climb
+- ⏰ **Smart Deadlines**: Because "someday" is not a real date
+- 📈 **Expected Progress**: See where you should be (no sugar coating!)
+- 🎨 **Beautiful UI**: Easy on the eyes, like a sunset (but more productive)
+- 📱 **Responsive Design**: Works on all devices (yes, even your smart fridge)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🎮 Show Me The Magic!
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Example 1: The Gym Enthusiast
+```yaml
+Goal: "Get Swole 💪"
+Start: 60kg bench press
+Target: 100kg bench press
+Deadline: 6 months
+Current: 75kg
+Expected Progress: 80kg
+Status: Slightly behind, but hey, Rome wasn't built in a day!
 ```
 
-**Edit a file directly in GitHub**
+### Example 2: The Saving Master
+```yaml
+Goal: "Save for Gaming PC 🖥️"
+Start: 0€
+Target: 2000€
+Deadline: 4 months
+Current: 800€
+Expected Progress: 500€
+Status: Ahead of schedule! (Did you rob a bank? 🤔)
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
 
-**Use GitHub Codespaces**
+## 🛠️ Tech Stack
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- React (because we're not savages)
+- TypeScript (for when JavaScript isn't painful enough)
+- Tailwind CSS (because writing CSS is so 2010)
+- ShadcnUI (for that extra ✨sparkle✨)
+- Dexie.js to let the Data sit on your device locally
 
-## What technologies are used for this project?
+## 📝 Requirements
 
-This project is built with .
+- Node.js (preferably a version from this decade)
+- A pulse
+- Basic ability to use a computer
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
-## How can I deploy this project?
+## 🚀 Dev Setup
 
-Simply open [Lovable](https://lovable.dev/projects/2e4154ad-312d-4f0f-9478-50e6f387b9ff) and click on Share -> Publish.
+1. Clone this bad boy:
+```bash
+git clone https://github.com/BenniBM/ontrack.git
+```
 
-## I want to use a custom domain - is that possible?
+2. Install the goods:
+```bash
+cd ontrack
+npm install # or yarn if you're fancy
+```
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+3. Run it like it's hot:
+```bash
+npm run dev # watch the magic happen
+```
+
+## 🤝 Contributing
+
+Found a bug? Want to add a feature? Have a million dollars to donate? Here's how you can contribute:
+
+1. Fork it
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add some amazingness'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request and cross your fingers 🤞
+
+## 📜 License
+
+MIT License - Feel free to use this project to track your progress toward world domination!
