@@ -1,6 +1,6 @@
 {
-    "name": "Progress",
-    "short_name": "Progress",
+    "name": "OnTrack",
+    "short_name": "OnTrack",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#000",

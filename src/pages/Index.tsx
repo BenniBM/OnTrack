@@ -75,7 +75,11 @@ const Index = () => {
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
-                <h1 className="text-2xl md:text-3xl font-bold">Progress Tracker</h1>
+                <div className="flex w-full sm:w-auto mb-3 justify-between items-center gap-4">
+                    <img src="icon.svg" className="hidden sm:block rounded-lg overflow-hidden w-10" />
+                    <h1 className="text-3xl font-bold">On Track</h1>
+                    <img src="icon.svg" className="sm:hidden rounded-lg overflow-hidden w-10" />
+                </div>
                 <div className="flex gap-2">
                     <Button onClick={() => setCreateDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
