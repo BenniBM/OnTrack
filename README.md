@@ -2,8 +2,6 @@
   
 # 🎯 OnTrack
 
-[Insert your awesome logo here]
-
 *Because even procrastinators deserve a progress bar!* 
 
 [![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB.svg)](https://reactjs.org/)
