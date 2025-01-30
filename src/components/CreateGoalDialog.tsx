@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -21,6 +21,9 @@ const formSchema = z.object({
     endDate: z.string().min(1, "End date is required"),
     startValue: z.string().min(1, "Start value is required"),
     endValue: z.string().min(1, "End value is required"),
+    unit: z.enum(["kg", "€", "%", "km", "h", "none"], {
+        required_error: "Unit is required",
+    }),
 });
 
 type GoalFormData = z.infer<typeof formSchema>;
@@ -68,6 +71,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                       endDate: existingGoal.endDate,
                       startValue: existingGoal.startValue.toString(),
                       endValue: existingGoal.endValue.toString(),
+                      unit: existingGoal.unit || "none",
                   }
                 : {
                       title: "",
@@ -77,6 +81,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                       endDate: calculateEndDate("1 Month"),
                       startValue: "0",
                       endValue: "100",
+                      unit: "none",
                   },
     });
 
@@ -94,6 +99,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                 endDate: existingGoal.endDate,
                 startValue: existingGoal.startValue.toString(),
                 endValue: existingGoal.endValue.toString(),
+                unit: existingGoal.unit || "none",
             });
         }
     }, [update, existingGoal, form]);
@@ -110,6 +116,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                       startValue: Number(data.startValue),
                       endValue: Number(data.endValue),
                       targetValue: targetValue,
+                      unit: data.unit,
                   }
                 : {
                       id: crypto.randomUUID(),
@@ -121,6 +128,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                       startValue: Number(data.startValue),
                       endValue: Number(data.endValue),
                       targetValue: targetValue,
+                      unit: data.unit,
                       subtasks: undefined,
                       progressLogs: [],
                   };
@@ -242,6 +250,32 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                                 )}
                             />
                         </div>
+
+                        <FormField
+                            control={form.control}
+                            name="unit"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Unit (optional)</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select unit" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="none">None</SelectItem>
+                                            <SelectItem value="kg">kg</SelectItem>
+                                            <SelectItem value="€">€</SelectItem>
+                                            <SelectItem value="%">%</SelectItem>
+                                            <SelectItem value="km">km</SelectItem>
+                                            <SelectItem value="hours">hours</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         <Button type="submit" className="w-full">
                             {update ? "Update Goal" : "Create Goal"}

@@ -24,5 +24,8 @@ export interface Goal {
     targetValue: number;
     subtasks?: Subtask[];
     description?: string;
+    unit: Unit;
     progressLogs: ProgressLog[];
 }
+
+export type Unit = "kg" | "€" | "%" | "km" | "h" | "none";

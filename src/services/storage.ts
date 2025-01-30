@@ -7,7 +7,7 @@ export class GoalDatabase extends Dexie {
     constructor() {
         super("GoalDatabase");
         this.version(1).stores({
-            goals: "id, title, type, startDate, endDate",
+            goals: "id, title, type, startDate, endDate, unit",
         });
     }
 }
