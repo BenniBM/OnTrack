@@ -269,7 +269,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                                             <SelectItem value="€">€</SelectItem>
                                             <SelectItem value="%">%</SelectItem>
                                             <SelectItem value="km">km</SelectItem>
-                                            <SelectItem value="hours">hours</SelectItem>
+                                            <SelectItem value="h">hours</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
