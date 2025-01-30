@@ -101,7 +101,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                             type="monotone"
                             fill="url(#fillExpected)"
                             fillOpacity={0.4}
-                            stroke="#888"
+                            stroke="#475569"
                             strokeWidth={2}
                             strokeLinecap="round"
                             strokeLinejoin="round"
