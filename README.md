@@ -49,10 +49,10 @@ Status: Ahead of schedule! (Did you rob a bank? 🤔)
 
 ## 🛠️ Tech Stack
 
-- React (because we're not savages)
-- TypeScript (for when JavaScript isn't painful enough)
-- Tailwind CSS (because writing CSS is so 2010)
-- ShadcnUI (for that extra ✨sparkle✨)
+- React 
+- TypeScript
+- Tailwind CSS 
+- ShadcnUI
 - Dexie.js to let the Data sit on your device locally
 
 ## 📝 Requirements
