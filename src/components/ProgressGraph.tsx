@@ -68,6 +68,8 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
     const isHigherThenExpected = currentProgress > expectedProgress;
     const isAhead = isDecreasingGoal ? !isHigherThenExpected : isHigherThenExpected;
 
+    const showUnitProgressWidget = goal.type !== "task" && goal.unit && goal.unit !== "none";
+
     return (
         <div className="space-y-4">
             <div className="text-left">
@@ -121,19 +123,21 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
                     </AreaChart>
                 </ChartContainer>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="grid gap-2 border rounded-lg md:p-4 p-3">
-                    <div className={`flex items-center gap-2 font-medium leading-none ${isAhead ? "text-green-500" : "text-red-500"}`}>
-                        {Math.abs(Number(progressDiff))} {isAhead && <TrendingUp className="h-4 w-4" />} {isAhead ? "Ahead" : "Behind"}
-                    </div>
-                    <div>
-                        <div className="text-left text-2xl">
-                            {currentProgress.toFixed(1)}
-                            {!goal.unit || goal.unit == "none" ? "" : goal.unit}
+            <div className={`grid gap-4 text-sm ${!showUnitProgressWidget ? "grid-cols-1" : "grid-cols-2"}`}>
+                {showUnitProgressWidget && (
+                    <div className="grid gap-2 border rounded-lg md:p-4 p-3">
+                        <div className={`flex items-center gap-2 font-medium leading-none ${isAhead ? "text-green-500" : "text-red-500"}`}>
+                            {Math.abs(Number(progressDiff))} {isAhead && <TrendingUp className="h-4 w-4" />} {isAhead ? "Ahead" : "Behind"}
                         </div>
-                        <div className="flex items-center gap-2 text-bold leading-none text-muted-foreground">Current Progress</div>
+                        <div>
+                            <div className="text-left text-2xl">
+                                {currentProgress.toFixed(1)}
+                                {!goal.unit || goal.unit == "none" ? "" : goal.unit}
+                            </div>
+                            <div className="flex items-center gap-2 text-bold leading-none text-muted-foreground">Current Progress</div>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div className="grid gap-2 border rounded-lg md:p-4 p-3">
                     <div className={`flex items-center gap-2 font-medium leading-none ${isAhead ? "text-green-500" : "text-red-500"}`}>
                         {Math.abs(Number(progressDiffPercentage.toFixed(1)))}% {isAhead && <TrendingUp className="h-4 w-4" />}{" "}
