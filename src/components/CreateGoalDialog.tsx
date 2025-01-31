@@ -5,15 +5,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Goal } from "../types/goal";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CircleCheckBig, TrendingUp } from "lucide-react";
 
-const formSchema = z.object({
+// Separate schemas for numerical and task goals
+const numericalGoalSchema = z.object({
     title: z.string().min(1, "Title is required"),
-    type: z.enum(["numerical", "task"] as const, {
-        required_error: "Type is required",
-    }),
+    type: z.literal("numerical"),
     timeframe: z.enum(["1 Month", "2 Months", "6 Months", "1 Year", "2 Years"], {
         required_error: "Timeframe is required",
     }),
@@ -25,6 +26,18 @@ const formSchema = z.object({
         required_error: "Unit is required",
     }),
 });
+
+const taskGoalSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    type: z.literal("task"),
+    timeframe: z.enum(["1 Month", "2 Months", "6 Months", "1 Year", "2 Years"], {
+        required_error: "Timeframe is required",
+    }),
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+});
+
+const formSchema = z.discriminatedUnion("type", [numericalGoalSchema, taskGoalSchema]);
 
 type GoalFormData = z.infer<typeof formSchema>;
 
@@ -69,9 +82,11 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                       timeframe: "1 Month",
                       startDate: existingGoal.startDate,
                       endDate: existingGoal.endDate,
-                      startValue: existingGoal.startValue.toString(),
-                      endValue: existingGoal.endValue.toString(),
-                      unit: existingGoal.unit || "none",
+                      ...(existingGoal.type === "numerical" && {
+                          startValue: existingGoal.startValue.toString(),
+                          endValue: existingGoal.endValue.toString(),
+                          unit: existingGoal.unit || "none",
+                      }),
                   }
                 : {
                       title: "",
@@ -85,8 +100,19 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                   },
     });
 
+    const goalType = form.watch("type");
+
     const handleTimeframeChange = (timeframe: string) => {
         form.setValue("endDate", calculateEndDate(timeframe));
+    };
+
+    const handleTypeChange = (type: "numerical" | "task") => {
+        form.setValue("type", type);
+        if (type === "task") {
+            form.unregister("startValue");
+            form.unregister("endValue");
+            form.unregister("unit");
+        }
     };
 
     useEffect(() => {
@@ -97,39 +123,53 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                 timeframe: "1 Month",
                 startDate: existingGoal.startDate,
                 endDate: existingGoal.endDate,
-                startValue: existingGoal.startValue.toString(),
-                endValue: existingGoal.endValue.toString(),
-                unit: existingGoal.unit || "none",
+                ...(existingGoal.type === "numerical" && {
+                    startValue: existingGoal.startValue.toString(),
+                    endValue: existingGoal.endValue.toString(),
+                    unit: existingGoal.unit || "none",
+                }),
             });
         }
     }, [update, existingGoal, form]);
 
     const onSubmit = (data: GoalFormData) => {
-        const targetValue = Number(data.endValue) - Number(data.startValue);
         const newGoal: Goal =
             update && existingGoal
                 ? {
                       ...existingGoal,
                       title: data.title,
+                      type: data.type,
                       startDate: data.startDate,
                       endDate: data.endDate,
-                      startValue: Number(data.startValue),
-                      endValue: Number(data.endValue),
-                      targetValue: targetValue,
-                      unit: data.unit,
+                      ...(data.type === "numerical" && {
+                          startValue: Number(data.startValue),
+                          endValue: Number(data.endValue),
+                          targetValue: Number(data.endValue) - Number(data.startValue),
+                          unit: data.unit,
+                      }),
                   }
                 : {
                       id: crypto.randomUUID(),
                       title: data.title,
-                      type: "numerical",
+                      type: data.type,
                       startDate: data.startDate,
                       endDate: data.endDate,
-                      currentValue: Number(data.startValue),
-                      startValue: Number(data.startValue),
-                      endValue: Number(data.endValue),
-                      targetValue: targetValue,
-                      unit: data.unit,
-                      subtasks: undefined,
+                      ...(data.type === "numerical"
+                          ? {
+                                currentValue: Number(data.startValue),
+                                startValue: Number(data.startValue),
+                                endValue: Number(data.endValue),
+                                targetValue: Number(data.endValue) - Number(data.startValue),
+                                unit: data.unit,
+                            }
+                          : {
+                                currentValue: 0,
+                                startValue: 0,
+                                endValue: 0,
+                                targetValue: 0,
+                                unit: "none",
+                                subtasks: [],
+                            }),
                       progressLogs: [],
                   };
 
@@ -155,6 +195,40 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                                     <FormLabel>Title</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Enter goal title" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="type"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Goal Type</FormLabel>
+                                    <FormControl>
+                                        <ToggleGroup
+                                            type="single"
+                                            value={field.value}
+                                            onValueChange={(value) => {
+                                                if (value) handleTypeChange(value as "numerical" | "task");
+                                            }}
+                                            className="justify-stretch w-full"
+                                            defaultValue={field.value} // Set initial focus
+                                        >
+                                            <ToggleGroupItem
+                                                value="numerical"
+                                                className="flex-1 border focus:text-slate-950"
+                                                aria-label="Toggle numerical">
+                                                <TrendingUp className="w-4 h-4 mr-2" />
+                                                Numerical
+                                            </ToggleGroupItem>
+                                            <ToggleGroupItem value="task" className="flex-1 border focus:text-slate-950" aria-label="Toggle task">
+                                                <CircleCheckBig className="w-4 h-4 mr-2" />
+                                                Tasks
+                                            </ToggleGroupItem>
+                                        </ToggleGroup>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -221,61 +295,65 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="startValue"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Start Value</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} placeholder="Start Value" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        {goalType === "numerical" && (
+                            <>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="startValue"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Start Value</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" {...field} placeholder="Start Value" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                            <FormField
-                                control={form.control}
-                                name="endValue"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>End Value</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} placeholder="End Value" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="endValue"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>End Value</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" {...field} placeholder="End Value" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
-                        <FormField
-                            control={form.control}
-                            name="unit"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Unit (optional)</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select unit" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="none">None</SelectItem>
-                                            <SelectItem value="kg">kg</SelectItem>
-                                            <SelectItem value="€">€</SelectItem>
-                                            <SelectItem value="%">%</SelectItem>
-                                            <SelectItem value="km">km</SelectItem>
-                                            <SelectItem value="h">hours</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                <FormField
+                                    control={form.control}
+                                    name="unit"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Unit</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select unit" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="none">None</SelectItem>
+                                                    <SelectItem value="kg">kg</SelectItem>
+                                                    <SelectItem value="€">€</SelectItem>
+                                                    <SelectItem value="%">%</SelectItem>
+                                                    <SelectItem value="km">km</SelectItem>
+                                                    <SelectItem value="h">hours</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </>
+                        )}
 
                         <Button type="submit" className="w-full">
                             {update ? "Update Goal" : "Create Goal"}
