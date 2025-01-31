@@ -165,7 +165,7 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                           : {
                                 currentValue: 0,
                                 startValue: 0,
-                                endValue: 0,
+                                endValue: 100,
                                 targetValue: 0,
                                 unit: "none",
                                 subtasks: [],
@@ -219,12 +219,16 @@ export const CreateGoalDialog: React.FC<CreateGoalDialogProps> = ({ open, onOpen
                                         >
                                             <ToggleGroupItem
                                                 value="numerical"
-                                                className="flex-1 border focus:text-slate-950"
+                                                className="flex-1 border hover:text-slate-950"
                                                 aria-label="Toggle numerical">
                                                 <TrendingUp className="w-4 h-4 mr-2" />
                                                 Numerical
                                             </ToggleGroupItem>
-                                            <ToggleGroupItem value="task" className="flex-1 border focus:text-slate-950" aria-label="Toggle task">
+                                            <ToggleGroupItem
+                                                value="task"
+                                                className="flex-1 border data-[state=on] hover:text-slate-950"
+                                                aria-checked="true"
+                                                aria-label="Toggle task">
                                                 <CircleCheckBig className="w-4 h-4 mr-2" />
                                                 Tasks
                                             </ToggleGroupItem>
