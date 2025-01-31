@@ -18,7 +18,8 @@ export const calculateExpectedProgress = (goal: Goal): number => {
 };
 
 export const calculateActualProgress = (goal: Goal): number => {
-    if (goal.type === "task" && goal.subtasks) {
+    if (goal.type === "task") {
+        if (goal.subtasks.length === 0) return 0;
         const completed = goal.subtasks.filter((task) => task.completed).length;
         return (completed / goal.subtasks.length) * 100;
     }

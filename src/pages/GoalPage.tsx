@@ -185,30 +185,32 @@ const GoalPage = () => {
                 </div>
                 <ProgressGraph goal={goalState ? goalState : goal} />
 
-                <div className="mt-20">
-                    <div className="flex justify-between items-end mb-4 text-left">
-                        <h2 className="text-2xl font-semibold">Log Progress</h2>
-                        <span className="text-sm text-muted-foreground">
-                            {progressValueState.toFixed(1)}% | {actualValueState.toFixed(1)}
-                        </span>
-                    </div>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <Slider
-                                value={[progressValueState]}
-                                onValueChange={(value) => handleSliderChange(value[0])}
-                                max={100}
-                                step={1}
-                                className="w-full"
-                            />
+                {goal.type === "numerical" && (
+                    <div className="mt-20">
+                        <div className="flex justify-between items-end mb-4 text-left">
+                            <h2 className="text-2xl font-semibold">Log Progress</h2>
+                            <span className="text-sm text-muted-foreground">
+                                {progressValueState.toFixed(1)}% | {actualValueState.toFixed(1)}
+                            </span>
                         </div>
-                        <Button
-                            onClick={() => handleLogProgress(goal.startValue + (progressValueState / 100) * (goal.endValue - goal.startValue))}
-                            className="w-full">
-                            Save Progress
-                        </Button>
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <Slider
+                                    value={[progressValueState]}
+                                    onValueChange={(value) => handleSliderChange(value[0])}
+                                    max={100}
+                                    step={1}
+                                    className="w-full"
+                                />
+                            </div>
+                            <Button
+                                onClick={() => handleLogProgress(goal.startValue + (progressValueState / 100) * (goal.endValue - goal.startValue))}
+                                className="w-full">
+                                Save Progress
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {goal.type === "task" && (
                     <div className="mt-20">
@@ -237,7 +239,7 @@ const GoalPage = () => {
                 )}
 
                 {/* Completed Tasks Accordion */}
-                {goal.subtasks.filter(({ completed }) => completed === true).length > 0 && (
+                {goal.subtasks?.filter(({ completed }) => completed === true).length > 0 && (
                     <Accordion type="single" collapsible className="mt-6 w-full">
                         <AccordionItem value="completed-tasks">
                             <AccordionTrigger>
