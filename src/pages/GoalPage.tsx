@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Edit2, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckSquare, Edit2, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -211,8 +211,8 @@ const GoalPage = () => {
                 </div>
 
                 {goal.type === "task" && (
-                    <Card className="p-6">
-                        <h2 className="text-lg md:text-xl font-semibold mb-4">Tasks</h2>
+                    <div className="mt-20">
+                        <h2 className="text-2xl text-left font-semibold mb-2">Tasks</h2>
                         <form onSubmit={handleAddTask} className="flex flex-col md:flex-row gap-2 mb-4">
                             <Input placeholder="Add a new task..." value={newTask} onChange={(e) => setNewTask(e.target.value)} className="flex-1" />
                             <Button type="submit" className="whitespace-nowrap">
@@ -221,17 +221,46 @@ const GoalPage = () => {
                             </Button>
                         </form>
                         <div className="space-y-2">
-                            {subtasks.map((task: Subtask) => (
-                                <div
-                                    key={task.id}
-                                    className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
-                                    onClick={() => toggleTask(task.id)}>
-                                    <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
-                                    <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
-                                </div>
-                            ))}
+                            {subtasks
+                                .filter(({ completed }) => completed === false)
+                                .map((task: Subtask) => (
+                                    <div
+                                        key={task.id}
+                                        className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
+                                        onClick={() => toggleTask(task.id)}>
+                                        <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
+                                        <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
+                                    </div>
+                                ))}
                         </div>
-                    </Card>
+                    </div>
+                )}
+
+                {/* Completed Tasks Accordion */}
+                {goal.subtasks.filter(({ completed }) => completed === true).length > 0 && (
+                    <Accordion type="single" collapsible className="mt-6 w-full">
+                        <AccordionItem value="completed-tasks">
+                            <AccordionTrigger>
+                                <div className="flex items-center">
+                                    <CheckSquare className="mr-2 h-4 w-4" />
+                                    <span className="no-underline">Completed Tasks</span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                {subtasks
+                                    .filter((task) => task.completed === true)
+                                    .map((task: Subtask) => (
+                                        <div
+                                            key={task.id}
+                                            className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
+                                            onClick={() => toggleTask(task.id)}>
+                                            <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
+                                            <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
+                                        </div>
+                                    ))}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 )}
 
                 {/* Completed Goals Accordion */}
