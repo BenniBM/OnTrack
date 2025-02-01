@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckSquare, Edit2, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckSquare, Edit2, GripVertical, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -17,6 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ProgressLogs } from "@/components/ProgressLogs";
 import { CreateGoalDialog } from "@/components/CreateGoalDialog";
 import { useLiveQuery } from "dexie-react-hooks";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -146,6 +147,23 @@ const GoalPage = () => {
         db.goals.put(updated);
     };
 
+    const handleDragEnd = (result) => {
+        if (!result.destination) return;
+
+        const reorderedSubtasks = Array.from(subtasks);
+        const [movedTask] = reorderedSubtasks.splice(result.source.index, 1);
+        reorderedSubtasks.splice(result.destination.index, 0, movedTask);
+
+        setSubtasks(reorderedSubtasks);
+
+        const updatedGoal = {
+            ...goal,
+            subtasks: reorderedSubtasks,
+        };
+
+        db.goals.put(updatedGoal);
+    };
+
     return (
         <div className="container py-4 px-0 md:py-8 max-w-4xl mx-auto">
             <Confetti onInit={handleConfettiInit} width={window.innerWidth} height={window.innerHeight}></Confetti>
@@ -222,19 +240,35 @@ const GoalPage = () => {
                                 Add Task
                             </Button>
                         </form>
-                        <div className="space-y-2">
-                            {subtasks
-                                .filter(({ completed }) => completed === false)
-                                .map((task: Subtask) => (
-                                    <div
-                                        key={task.id}
-                                        className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
-                                        onClick={() => toggleTask(task.id)}>
-                                        <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
-                                        <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                            <Droppable droppableId="tasks">
+                                {(provided) => (
+                                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                                        {subtasks
+                                            .filter(({ completed }) => completed === false)
+                                            .map((task: Subtask, index: number) => (
+                                                <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                    {(provided) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
+                                                            className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
+                                                            onClick={() => toggleTask(task.id)}>
+                                                            <GripVertical className="h-4 w-4 text-slate-500" />
+                                                            <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
+                                                            <span className={task.completed ? "line-through text-muted-foreground" : ""}>
+                                                                {task.title}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                        {provided.placeholder}
                                     </div>
-                                ))}
-                        </div>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
                     </div>
                 )}
 
