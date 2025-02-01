@@ -150,15 +150,18 @@ const GoalPage = () => {
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
-        const reorderedSubtasks = Array.from(subtasks);
+        const reorderedSubtasks = Array.from(subtasks).filter(({ completed }) => completed === false);
         const [movedTask] = reorderedSubtasks.splice(result.source.index, 1);
         reorderedSubtasks.splice(result.destination.index, 0, movedTask);
 
-        setSubtasks(reorderedSubtasks);
+        const completedTasks = subtasks.filter(({ completed }) => completed === true);
+        const newSubTasks = [...reorderedSubtasks, ...completedTasks];
+
+        setSubtasks(newSubTasks);
 
         const updatedGoal = {
             ...goal,
-            subtasks: reorderedSubtasks,
+            subtasks: newSubTasks,
         };
 
         db.goals.put(updatedGoal);
