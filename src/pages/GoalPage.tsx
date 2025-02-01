@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckSquare, Edit2, GripVertical, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckSquare, Edit2, EditIcon, GripVertical, History, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -18,12 +18,15 @@ import { ProgressLogs } from "@/components/ProgressLogs";
 import { CreateGoalDialog } from "@/components/CreateGoalDialog";
 import { useLiveQuery } from "dexie-react-hooks";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [newTask, setNewTask] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editDateDialogOpen, setEditDateDialogOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Subtask | null>(null);
     const goals = useLiveQuery(() => db.goals.toArray(), []);
     const goal = goals?.find((g) => g.id === id);
     const [goalState, setGoalState] = useState<Goal | null>(null);
@@ -104,7 +107,9 @@ const GoalPage = () => {
     };
 
     const toggleTask = (taskId: string) => {
-        const updatedSubtasks = subtasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task));
+        const updatedSubtasks = subtasks.map((task) =>
+            task.id === taskId ? { ...task, completed: !task.completed, completedDate: !task.completed ? new Date().toISOString() : null } : task
+        );
 
         setSubtasks(updatedSubtasks);
 
@@ -114,6 +119,22 @@ const GoalPage = () => {
         };
 
         db.goals.put(updatedGoal);
+    };
+
+    const handleCompletedDateChange = (date: string) => {
+        if (selectedTask) {
+            const updatedSubtasks = subtasks.map((task) => (task.id === selectedTask.id ? { ...task, completedDate: date } : task));
+
+            setSubtasks(updatedSubtasks);
+
+            const updatedGoal = {
+                ...goal,
+                subtasks: updatedSubtasks,
+            };
+
+            db.goals.put(updatedGoal);
+            setEditDateDialogOpen(false);
+        }
     };
 
     const handleDelete = () => {
@@ -162,6 +183,32 @@ const GoalPage = () => {
         const updatedGoal = {
             ...goal,
             subtasks: newSubTasks,
+        };
+
+        db.goals.put(updatedGoal);
+    };
+
+    const deleteTask = (taskId: string) => {
+        const updatedSubtasks = subtasks.filter((task) => task.id !== taskId);
+
+        setSubtasks(updatedSubtasks);
+
+        const updatedGoal = {
+            ...goal,
+            subtasks: updatedSubtasks,
+        };
+
+        db.goals.put(updatedGoal);
+    };
+
+    const handleTaskSizeChange = (taskId: string, size: string) => {
+        const updatedSubtasks = subtasks.map((task) => (task.id === taskId ? { ...task, size } : task));
+
+        setSubtasks(updatedSubtasks);
+
+        const updatedGoal = {
+            ...goal,
+            subtasks: updatedSubtasks,
         };
 
         db.goals.put(updatedGoal);
@@ -256,13 +303,37 @@ const GoalPage = () => {
                                                             ref={provided.innerRef}
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
-                                                            className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
-                                                            onClick={() => toggleTask(task.id)}>
-                                                            <GripVertical className="h-4 w-4 text-slate-500" />
-                                                            <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
-                                                            <span className={task.completed ? "line-through text-muted-foreground" : ""}>
-                                                                {task.title}
-                                                            </span>
+                                                            className="flex items-center justify-between p-2 hover:bg-accent/5 rounded-lg cursor-pointer">
+                                                            <div onClick={() => toggleTask(task.id)} className="flex w-full items-center gap-2">
+                                                                <GripVertical className="h-4 w-4 text-slate-500" />
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={task.completed}
+                                                                    onChange={() => {}}
+                                                                    className="h-4 w-4"
+                                                                />
+                                                                <span className={task.completed ? "line-through text-muted-foreground" : ""}>
+                                                                    {task.title}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <Select
+                                                                    defaultValue={"M"}
+                                                                    onValueChange={(value) => handleTaskSizeChange(task.id, value)}>
+                                                                    <SelectTrigger className="border-0">
+                                                                        <SelectValue placeholder="M" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="S">S</SelectItem>
+                                                                        <SelectItem value="M">M</SelectItem>
+                                                                        <SelectItem value="L">L</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <Trash2
+                                                                    className="h-4 w-4 text-destructive cursor-pointer"
+                                                                    onClick={() => deleteTask(task.id)}
+                                                                />
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </Draggable>
@@ -289,12 +360,24 @@ const GoalPage = () => {
                                 {subtasks
                                     .filter((task) => task.completed === true)
                                     .map((task: Subtask) => (
-                                        <div
-                                            key={task.id}
-                                            className="flex items-center gap-2 p-2 hover:bg-accent/5 rounded-lg cursor-pointer"
-                                            onClick={() => toggleTask(task.id)}>
-                                            <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
-                                            <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
+                                        <div key={task.id} className="flex items-center justify-between p-2 hover:bg-accent/5 rounded-lg">
+                                            <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleTask(task.id)}>
+                                                <input type="checkbox" checked={task.completed} onChange={() => {}} className="h-4 w-4" />
+                                                <span className={task.completed ? "line-through text-muted-foreground" : ""}>{task.title}</span>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-sm text-slate-500 mr-1">
+                                                    {task.completedDate ? task.completedDate.split("T")[0] : ""}
+                                                </span>
+                                                <EditIcon
+                                                    className="h-4 w-4 cursor-pointer"
+                                                    onClick={() => {
+                                                        setSelectedTask(task);
+                                                        setEditDateDialogOpen(true);
+                                                    }}
+                                                />
+                                                <Trash2 className="h-4 w-4 text-destructive cursor-pointer" onClick={() => deleteTask(task.id)} />
+                                            </div>
                                         </div>
                                     ))}
                             </AccordionContent>
@@ -335,6 +418,24 @@ const GoalPage = () => {
                         <Button variant="destructive" onClick={handleDelete}>
                             Delete
                         </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={editDateDialogOpen} onOpenChange={setEditDateDialogOpen}>
+                <DialogContent>
+                    <DialogTitle>Edit Completed Date</DialogTitle>
+                    <DialogDescription>Select a new completed date for the task.</DialogDescription>
+                    <Input
+                        type="date"
+                        value={selectedTask?.completedDate ? selectedTask.completedDate.split("T")[0] : ""}
+                        onChange={(e) => handleCompletedDateChange(e.target.value)}
+                        className="mt-4"
+                    />
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditDateDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={() => setEditDateDialogOpen(false)}>Save</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

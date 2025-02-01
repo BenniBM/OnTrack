@@ -4,6 +4,8 @@ export interface Subtask {
     id: string;
     title: string;
     completed: boolean;
+    completedDate?: string;
+    // size: "S" | "M" | "L";
 }
 
 export interface ProgressLog {
