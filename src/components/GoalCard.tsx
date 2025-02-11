@@ -14,7 +14,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
     const actualProgress = calculateActualProgress(goal);
     const expectedProgress = calculateExpectedProgress(goal);
 
-    const bgColor = actualProgress > expectedProgress ? "bg-green-500" : "bg-red-500";
+    const bgColor = actualProgress >= expectedProgress ? "bg-green-500" : "bg-red-500";
 
     return (
         <Card className="hover:shadow-lg text-left transition-shadow cursor-pointer" onClick={() => navigate(`/goal/${goal.id}`)}>
