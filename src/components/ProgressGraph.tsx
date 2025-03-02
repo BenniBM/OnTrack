@@ -65,7 +65,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
     const progressDiff = (currentProgress - expectedProgress).toFixed(1);
     const progressDiffPercentage = currentProgressPercentage - expectedProgressPercentage;
     const isDecreasingGoal = goal.startValue > goal.endValue;
-    const isHigherThenExpected = currentProgress > expectedProgress;
+    const isHigherThenExpected = currentProgress >= expectedProgress;
     const isAhead = isDecreasingGoal ? !isHigherThenExpected : isHigherThenExpected;
 
     return (
