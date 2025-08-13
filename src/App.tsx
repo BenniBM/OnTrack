@@ -24,16 +24,14 @@ const ProtectedRoutes = () => {
     return (
         <Router>
             <div className="min-h-screen flex flex-col">
-                <main className="flex-1 pb-20">
-                    <Routes>
-                        <Route path="/" element={<Goals />} />
-                        <Route path="/reviews" element={<Reviews />} />
-                        <Route path="/review" element={<ReviewPage />} />
-                        <Route path="/review/:id" element={<ReviewPage />} />
-                        <Route path="/goal/:id" element={<GoalPage />} />
-                    </Routes>
-                </main>
                 <TabNavigation />
+                <Routes>
+                    <Route path="/" element={<Goals />} />
+                    <Route path="/reviews" element={<Reviews />} />
+                    <Route path="/review" element={<ReviewPage />} />
+                    <Route path="/review/:id" element={<ReviewPage />} />
+                    <Route path="/goal/:id" element={<GoalPage />} />
+                </Routes>
             </div>
             <Toaster />
         </Router>

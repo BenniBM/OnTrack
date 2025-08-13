@@ -124,7 +124,7 @@ const Index = () => {
             )}
 
             {/* Floating Action Button for Add Goal */}
-            <div className="fixed bottom-16 right-6 z-50">
+            <div className="fixed bottom-6 right-6 z-50">
                 <div className="flex">
                     <Button onClick={() => setCreateDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />

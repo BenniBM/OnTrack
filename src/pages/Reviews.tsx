@@ -14,7 +14,7 @@ const ReviewsPage = () => {
             </div>
 
             {/* Floating Action Button for Add Review */}
-            <div className="fixed bottom-16 right-6 z-50">
+            <div className="fixed bottom-6 right-6 z-50">
                 <Button onClick={() => navigate("/review")}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Review
