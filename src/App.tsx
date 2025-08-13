@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Goals from "./pages/Goals";
 import GoalPage from "./pages/GoalPage";
 import Reviews from "./pages/Reviews";
+import ReviewPage from "./pages/ReviewPage";
 import LoginScreen from "./components/LoginScreen";
 import "./App.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -24,6 +25,8 @@ const ProtectedRoutes = () => {
             <Routes>
                 <Route path="/" element={<Goals />} />
                 <Route path="/reviews" element={<Reviews />} />
+                <Route path="/review" element={<ReviewPage />} />
+                <Route path="/review/:id" element={<ReviewPage />} />
                 <Route path="/goal/:id" element={<GoalPage />} />
             </Routes>
             <Toaster />

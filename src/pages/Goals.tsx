@@ -92,9 +92,6 @@ const Index = () => {
         <div className="container py-4 md:py-8 px-4 md:px-8">
             {/* Tab Navigation */}
             <TabNavigation />
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
-                <div className="flex gap-2">{deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}</div>
-            </div>
 
             {/* Active Goals Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
@@ -132,10 +129,13 @@ const Index = () => {
 
             {/* Floating Action Button for Add Goal */}
             <div className="fixed bottom-6 right-6 z-50">
-                <Button onClick={() => setCreateDialogOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Goal
-                </Button>
+                <div className="flex gap-2">
+                    <Button onClick={() => setCreateDialogOpen(true)}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Goal
+                    </Button>
+                    <div className="flex gap-2">{deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}</div>
+                </div>
             </div>
 
             <CreateGoalDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onGoalCreate={handleGoalCreate} />
