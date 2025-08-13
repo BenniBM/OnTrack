@@ -8,6 +8,13 @@ export const TabNavigation: React.FC = () => {
     const location = useLocation();
     const { signOut } = useAuth();
 
+    // Only show navigation on main pages
+    const shouldShowNavigation = location.pathname === "/" || location.pathname === "/reviews";
+
+    if (!shouldShowNavigation) {
+        return null;
+    }
+
     return (
         <div className="w-full px-4 py-3">
             <div className="flex w-full">
