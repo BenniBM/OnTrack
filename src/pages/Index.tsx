@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { GoalCard } from "../components/GoalCard";
 import { CreateGoalDialog } from "../components/CreateGoalDialog";
 import { Goal } from "../types/goal";
-import { db } from "../services/storage";
 import { useToast } from "@/components/ui/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { calculateActualProgress, calculateExpectedProgress } from "@/utils/progressCalculations";
-import { useLiveQuery } from "dexie-react-hooks";
+import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
+import { useAuth } from "../contexts/AuthContext";
 
 const Index = () => {
-    const goals = useLiveQuery(() => db.goals.toArray(), []);
+    const { goals, loading, error, addGoal } = useSupabaseGoals();
+    const { user, loading: authLoading } = useAuth();
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const { toast } = useToast();
@@ -41,14 +42,24 @@ const Index = () => {
         };
     }, []);
 
+    if (authLoading || loading) return <div className="container py-8 px-4 text-center">Loading...</div>;
+    if (error) return <div className="container py-8 px-4 text-center text-red-500">Error: {error}</div>;
     if (!goals) return null;
 
-    const handleGoalCreate = (newGoal: Goal) => {
-        db.goals.add(newGoal);
-        toast({
-            title: "Goal Created",
-            description: "Your new goal has been created successfully.",
-        });
+    const handleGoalCreate = async (newGoal: Goal) => {
+        const result = await addGoal(newGoal);
+        if (result) {
+            toast({
+                title: "Goal Created",
+                description: "Your new goal has been created successfully.",
+            });
+        } else {
+            toast({
+                title: "Error",
+                description: "Failed to create goal. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     const handleInstallClick = () => {

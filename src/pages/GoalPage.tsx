@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Goal, Subtask } from "../types/goal";
-import { db } from "../services/storage";
 import { ProgressGraph } from "../components/ProgressGraph";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -16,14 +15,16 @@ import { TConductorInstance, TPresetInstanceProps } from "react-canvas-confetti/
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ProgressLogs } from "@/components/ProgressLogs";
 import { CreateGoalDialog } from "@/components/CreateGoalDialog";
-import { useLiveQuery } from "dexie-react-hooks";
+import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
+import { useAuth } from "../contexts/AuthContext";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [newTask, setNewTask] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const goals = useLiveQuery(() => db.goals.toArray(), []);
+    const { goals, loading, error, updateGoal, deleteGoal, updateSubtasks, updateProgressLogs, updateCurrentValue } = useSupabaseGoals();
+    const { user, loading: authLoading } = useAuth();
     const goal = goals?.find((g) => g.id === id);
     const [goalState, setGoalState] = useState<Goal | null>(null);
 
@@ -44,6 +45,8 @@ const GoalPage = () => {
         }
     }, [goal]);
 
+    if (authLoading || loading) return <div className="container py-8 px-4 text-center">Loading...</div>;
+    if (error) return <div className="container py-8 px-4 text-center text-red-500">Error: {error}</div>;
     if (!goals) return null;
 
     if (!goal) {
@@ -51,7 +54,7 @@ const GoalPage = () => {
         return null;
     }
 
-    const handleAddTask = (e: React.FormEvent) => {
+    const handleAddTask = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newTask.trim()) return;
 
@@ -68,7 +71,7 @@ const GoalPage = () => {
             ...goal,
             subtasks: updatedSubtasks,
         };
-        db.goals.put(updatedGoal);
+        await updateGoal(updatedGoal);
 
         setNewTask("");
         toast({
@@ -77,7 +80,7 @@ const GoalPage = () => {
         });
     };
 
-    const handleLogProgress = (value: number) => {
+    const handleLogProgress = async (value: number) => {
         const today = new Date().toISOString().split("T")[0];
         const updatedProgressLogs = goal.progressLogs?.filter((log) => new Date(log.timestamp).toISOString().split("T")[0] !== today) || [];
 
@@ -99,10 +102,10 @@ const GoalPage = () => {
             progressLogs: updatedProgressLogs,
         };
 
-        db.goals.put(updatedGoal);
+        await updateGoal(updatedGoal);
     };
 
-    const toggleTask = (taskId: string) => {
+    const toggleTask = async (taskId: string) => {
         const updatedSubtasks = subtasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task));
 
         setSubtasks(updatedSubtasks);
@@ -112,17 +115,25 @@ const GoalPage = () => {
             subtasks: updatedSubtasks,
         };
 
-        db.goals.put(updatedGoal);
+        await updateGoal(updatedGoal);
     };
 
-    const handleDelete = () => {
-        db.goals.delete(goal.id);
-        toast({
-            title: "Goal Deleted",
-            description: "The goal has been deleted successfully.",
-            variant: "destructive",
-        });
-        navigate("/");
+    const handleDelete = async () => {
+        const success = await deleteGoal(goal.id);
+        if (success) {
+            toast({
+                title: "Goal Deleted",
+                description: "The goal has been deleted successfully.",
+                variant: "destructive",
+            });
+            navigate("/");
+        } else {
+            toast({
+                title: "Error",
+                description: "Failed to delete goal. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     const handleSliderChange = (value: number) => {
@@ -138,12 +149,12 @@ const GoalPage = () => {
         confettiRef.current = conductor;
     };
 
-    const handleGoalUpdate = (updatedGoal: Goal) => {
+    const handleGoalUpdate = async (updatedGoal: Goal) => {
         const updated = {
             ...goal,
             ...updatedGoal,
         };
-        db.goals.put(updated);
+        await updateGoal(updated);
     };
 
     return (

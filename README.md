@@ -2,7 +2,7 @@
   
 # 🎯 OnTrack
 
-*Because even procrastinators deserve a progress bar!* 
+_Because even procrastinators deserve a progress bar!_
 
 [![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB.svg)](https://reactjs.org/)
 
@@ -16,15 +16,16 @@ Ever set a goal and then completely forgot about it until the night before? Yeah
 
 ## ✨ Features That'll Make You Go "Wow!"
 
-- 📊 **Progress Tracking**: Watch your progress climb
-- ⏰ **Smart Deadlines**: Because "someday" is not a real date
-- 📈 **Expected Progress**: See where you should be (no sugar coating!)
-- 🎨 **Beautiful UI**: Easy on the eyes, like a sunset (but more productive)
-- 📱 **Responsive Design**: Works on all devices (yes, even your smart fridge)
+-   📊 **Progress Tracking**: Watch your progress climb
+-   ⏰ **Smart Deadlines**: Because "someday" is not a real date
+-   📈 **Expected Progress**: See where you should be (no sugar coating!)
+-   🎨 **Beautiful UI**: Easy on the eyes, like a sunset (but more productive)
+-   📱 **Responsive Design**: Works on all devices (yes, even your smart fridge)
 
 ## 🎮 Show Me The Magic!
 
 ### Example 1: The Gym Enthusiast
+
 ```yaml
 Goal: "Get Swole 💪"
 Start: 60kg bench press
@@ -36,6 +37,7 @@ Status: Slightly behind, but hey, Rome wasn't built in a day!
 ```
 
 ### Example 2: The Saving Master
+
 ```yaml
 Goal: "Save for Gaming PC 🖥️"
 Start: 0€
@@ -46,36 +48,37 @@ Expected Progress: 500€
 Status: Ahead of schedule! (Did you rob a bank? 🤔)
 ```
 
-
 ## 🛠️ Tech Stack
 
-- React 
-- TypeScript
-- Tailwind CSS 
-- ShadcnUI
-- Dexie.js to let the Data sit on your device locally
+-   React
+-   TypeScript
+-   Tailwind CSS
+-   ShadcnUI
+-   Supabase for cloud database and authentication
 
 ## 📝 Requirements
 
-- Node.js (preferably a version from this decade)
-- A pulse
-- Basic ability to use a computer
-
+-   Node.js (preferably a version from this decade)
+-   A pulse
+-   Basic ability to use a computer
 
 ## 🚀 Dev Setup
 
 1. Clone this bad boy:
+
 ```bash
 git clone https://github.com/BenniBM/ontrack.git
 ```
 
 2. Install the goods:
+
 ```bash
 cd ontrack
 npm install # or yarn if you're fancy
 ```
 
 3. Run it like it's hot:
+
 ```bash
 npm run dev # watch the magic happen
 ```
