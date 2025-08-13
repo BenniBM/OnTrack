@@ -11,7 +11,6 @@ import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
 import { useAuth } from "../contexts/AuthContext";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useNavigate, useLocation } from "react-router-dom";
-import { TabNavigation } from "@/components/TabNavigation";
 
 const Index = () => {
     const { goals, loading, error, addGoal } = useSupabaseGoals();
@@ -90,9 +89,6 @@ const Index = () => {
 
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
-            {/* Tab Navigation */}
-            <TabNavigation />
-
             {/* Active Goals Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
                 {activeGoals.map((goal) => (
@@ -128,13 +124,17 @@ const Index = () => {
             )}
 
             {/* Floating Action Button for Add Goal */}
-            <div className="fixed bottom-6 right-6 z-50">
-                <div className="flex gap-2">
+            <div className="fixed bottom-16 right-6 z-50">
+                <div className="flex">
                     <Button onClick={() => setCreateDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
                         Add Goal
                     </Button>
-                    <div className="flex gap-2">{deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}</div>
+                    {deferredPrompt && (
+                        <Button className="ml-2" onClick={handleInstallClick}>
+                            Install App
+                        </Button>
+                    )}
                 </div>
             </div>
 

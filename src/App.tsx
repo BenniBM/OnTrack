@@ -5,6 +5,7 @@ import GoalPage from "./pages/GoalPage";
 import Reviews from "./pages/Reviews";
 import ReviewPage from "./pages/ReviewPage";
 import LoginScreen from "./components/LoginScreen";
+import { TabNavigation } from "./components/TabNavigation";
 import "./App.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LoadingSpinner } from "./components/LoadingSpinner";
@@ -22,13 +23,18 @@ const ProtectedRoutes = () => {
 
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<Goals />} />
-                <Route path="/reviews" element={<Reviews />} />
-                <Route path="/review" element={<ReviewPage />} />
-                <Route path="/review/:id" element={<ReviewPage />} />
-                <Route path="/goal/:id" element={<GoalPage />} />
-            </Routes>
+            <div className="min-h-screen flex flex-col">
+                <main className="flex-1 pb-20">
+                    <Routes>
+                        <Route path="/" element={<Goals />} />
+                        <Route path="/reviews" element={<Reviews />} />
+                        <Route path="/review" element={<ReviewPage />} />
+                        <Route path="/review/:id" element={<ReviewPage />} />
+                        <Route path="/goal/:id" element={<GoalPage />} />
+                    </Routes>
+                </main>
+                <TabNavigation />
+            </div>
             <Toaster />
         </Router>
     );
