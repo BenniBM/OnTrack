@@ -6,7 +6,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     error: string | null;
-    signIn: () => Promise<void>;
+    signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
 }
 
@@ -29,11 +29,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const signIn = async () => {
+    const signIn = async (email: string, password: string) => {
         try {
             setLoading(true);
             setError(null);
-            const { user: authUser, error: authError } = await authenticateUser();
+            const { user: authUser, error: authError } = await authenticateUser(email, password);
 
             if (authError) {
                 setError(authError.message);
@@ -69,14 +69,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 const currentUser = await getCurrentUser();
                 if (currentUser) {
                     setUser(currentUser);
-                } else {
-                    // Auto-authenticate if no user is found
-                    await signIn();
                 }
             } catch (err) {
                 console.error("Error checking user:", err);
-                // Auto-authenticate on error
-                await signIn();
             } finally {
                 setLoading(false);
             }

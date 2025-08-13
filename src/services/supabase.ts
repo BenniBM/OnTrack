@@ -12,12 +12,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // Static user credentials
 const STATIC_PASSWORD = "bay3rn08";
 
-export const authenticateUser = async () => {
+export const authenticateUser = async (email: string, password: string) => {
     try {
-        // Sign in with existing credentials
+        // Sign in with provided credentials
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: `benni.mehlbm@gmail.com`,
-            password: STATIC_PASSWORD,
+            email,
+            password,
         });
 
         if (signInError) {

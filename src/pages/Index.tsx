@@ -9,10 +9,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { calculateActualProgress, calculateExpectedProgress } from "@/utils/progressCalculations";
 import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
 import { useAuth } from "../contexts/AuthContext";
+import { LogOut } from "lucide-react";
 
 const Index = () => {
     const { goals, loading, error, addGoal } = useSupabaseGoals();
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, signOut } = useAuth();
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const { toast } = useToast();
@@ -97,6 +98,10 @@ const Index = () => {
                         Add Goal
                     </Button>
                     {deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}
+                    <Button variant="outline" onClick={signOut}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                    </Button>
                 </div>
             </div>
 
