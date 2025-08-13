@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import Index from "./pages/Index";
+import Goals from "./pages/Goals";
 import GoalPage from "./pages/GoalPage";
+import Reviews from "./pages/Reviews";
 import LoginScreen from "./components/LoginScreen";
 import "./App.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -21,7 +22,8 @@ const ProtectedRoutes = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Goals />} />
+                <Route path="/reviews" element={<Reviews />} />
                 <Route path="/goal/:id" element={<GoalPage />} />
             </Routes>
             <Toaster />

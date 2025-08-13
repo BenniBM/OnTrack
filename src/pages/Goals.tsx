@@ -9,8 +9,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { calculateActualProgress, calculateExpectedProgress } from "@/utils/progressCalculations";
 import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
 import { useAuth } from "../contexts/AuthContext";
-import { LogOut } from "lucide-react";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useNavigate, useLocation } from "react-router-dom";
+import { TabNavigation } from "@/components/TabNavigation";
 
 const Index = () => {
     const { goals, loading, error, addGoal } = useSupabaseGoals();
@@ -18,6 +19,8 @@ const Index = () => {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const { toast } = useToast();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         if (goals) {
@@ -87,23 +90,10 @@ const Index = () => {
 
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
+            {/* Tab Navigation */}
+            <TabNavigation />
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
-                <div className="flex w-full sm:w-auto mb-3 justify-between items-center gap-4">
-                    <img src="icon.svg" className="hidden sm:block rounded-lg overflow-hidden w-10" />
-                    <h1 className="text-3xl font-bold">On Track</h1>
-                    <img src="icon.svg" className="sm:hidden rounded-lg overflow-hidden w-10" />
-                </div>
-                <div className="flex gap-2">
-                    <Button onClick={() => setCreateDialogOpen(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Goal
-                    </Button>
-                    {deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}
-                    <Button variant="outline" onClick={signOut}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sign Out
-                    </Button>
-                </div>
+                <div className="flex gap-2">{deferredPrompt && <Button onClick={handleInstallClick}>Install App</Button>}</div>
             </div>
 
             {/* Active Goals Grid */}
@@ -139,6 +129,14 @@ const Index = () => {
                     </AccordionItem>
                 </Accordion>
             )}
+
+            {/* Floating Action Button for Add Goal */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <Button onClick={() => setCreateDialogOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Goal
+                </Button>
+            </div>
 
             <CreateGoalDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} onGoalCreate={handleGoalCreate} />
         </div>
