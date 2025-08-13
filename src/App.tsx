@@ -5,12 +5,13 @@ import GoalPage from "./pages/GoalPage";
 import LoginScreen from "./components/LoginScreen";
 import "./App.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { LoadingSpinner } from "./components/LoadingSpinner";
 
 const ProtectedRoutes = () => {
     const { user, loading } = useAuth();
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+        return <LoadingSpinner />;
     }
 
     if (!user) {

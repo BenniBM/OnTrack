@@ -17,6 +17,7 @@ import { ProgressLogs } from "@/components/ProgressLogs";
 import { CreateGoalDialog } from "@/components/CreateGoalDialog";
 import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
 import { useAuth } from "../contexts/AuthContext";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 const GoalPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -45,7 +46,7 @@ const GoalPage = () => {
         }
     }, [goal]);
 
-    if (authLoading || loading) return <div className="container py-8 px-4 text-center">Loading...</div>;
+    if (authLoading || loading) return <LoadingSpinner />;
     if (error) return <div className="container py-8 px-4 text-center text-red-500">Error: {error}</div>;
     if (!goals) return null;
 

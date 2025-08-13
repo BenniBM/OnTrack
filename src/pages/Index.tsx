@@ -10,6 +10,7 @@ import { calculateActualProgress, calculateExpectedProgress } from "@/utils/prog
 import { useSupabaseGoals } from "../hooks/useSupabaseGoals";
 import { useAuth } from "../contexts/AuthContext";
 import { LogOut } from "lucide-react";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 const Index = () => {
     const { goals, loading, error, addGoal } = useSupabaseGoals();
@@ -43,7 +44,7 @@ const Index = () => {
         };
     }, []);
 
-    if (authLoading || loading) return <div className="container py-8 px-4 text-center">Loading...</div>;
+    if (authLoading || loading) return <LoadingSpinner />;
     if (error) return <div className="container py-8 px-4 text-center text-red-500">Error: {error}</div>;
     if (!goals) return null;
 
