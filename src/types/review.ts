@@ -7,6 +7,9 @@ export interface Review {
     relationships: number;
     progressing: number;
     work: number;
+    cash?: number;
+    weight?: number;
+    screentime?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -19,6 +22,9 @@ export interface CreateReviewData {
     relationships?: number;
     progressing?: number;
     work?: number;
+    cash?: number;
+    weight?: number;
+    screentime?: number;
 }
 
 export interface UpdateReviewData extends Partial<CreateReviewData> {

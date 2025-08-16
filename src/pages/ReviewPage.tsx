@@ -7,11 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Save, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar, X, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useSupabaseReviews } from "@/hooks/useSupabaseReviews";
 import { CreateReviewData, UpdateReviewData } from "@/types/review";
+import { FormItem, FormLabel } from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
 
 const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
@@ -21,6 +24,11 @@ const ReviewPage = () => {
     const [relationships, setRelationships] = useState([3]);
     const [progressing, setProgressing] = useState([3]);
     const [work, setWork] = useState([3]);
+    const [cash, setCash] = useState("");
+    const [weight, setWeight] = useState("");
+    const [screentime, setScreentime] = useState("");
+    const [screentimeHours, setScreentimeHours] = useState("");
+    const [screentimeMinutes, setScreentimeMinutes] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -28,6 +36,7 @@ const ReviewPage = () => {
     const [goodOpen, setGoodOpen] = useState(false);
     const [badOpen, setBadOpen] = useState(false);
     const [metricsOpen, setMetricsOpen] = useState(true);
+    const [numbersOpen, setNumbersOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -62,6 +71,16 @@ const ReviewPage = () => {
                 setRelationships([review.relationships || 3]);
                 setProgressing([review.progressing || 3]);
                 setWork([review.work || 3]);
+                setCash(review.cash?.toString() || "");
+                setWeight(review.weight?.toString() || "");
+                setScreentime(review.screentime?.toString() || "");
+                if (review.screentime) {
+                    setScreentimeHours(Math.floor(review.screentime / 60).toString());
+                    setScreentimeMinutes((review.screentime % 60).toString());
+                } else {
+                    setScreentimeHours("");
+                    setScreentimeMinutes("");
+                }
             }
         } catch (error) {
             console.error("Error loading review:", error);
@@ -100,6 +119,12 @@ const ReviewPage = () => {
                     relationships: relationships[0],
                     progressing: progressing[0],
                     work: work[0],
+                    cash: cash.trim() ? parseFloat(cash) : undefined,
+                    weight: weight.trim() ? parseFloat(weight) : undefined,
+                    screentime:
+                        screentimeHours.trim() || screentimeMinutes.trim()
+                            ? parseInt(screentimeHours || "0") * 60 + parseInt(screentimeMinutes || "0")
+                            : undefined,
                 };
                 result = await updateReview(updateData);
             } else {
@@ -112,6 +137,12 @@ const ReviewPage = () => {
                     relationships: relationships[0],
                     progressing: progressing[0],
                     work: work[0],
+                    cash: cash.trim() ? parseFloat(cash) : undefined,
+                    weight: weight.trim() ? parseFloat(weight) : undefined,
+                    screentime:
+                        screentimeHours.trim() || screentimeMinutes.trim()
+                            ? parseInt(screentimeHours || "0") * 60 + parseInt(screentimeMinutes || "0")
+                            : undefined,
                 };
                 result = await addReview(createData);
             }
@@ -169,15 +200,7 @@ const ReviewPage = () => {
                     <ArrowLeft className="h-4 w-4" />
                     Back
                 </Button>
-                <Button variant="outline" onClick={() => setDeleteDialogOpen(true)} disabled={!isEditing}>
-                    <Trash className="mr-2 h-4 w-4" /> Delete
-                </Button>
-            </div>
-
-            <div className="space-y-4 md:space-y-6">
-                <div className="flex flex-row text-left justify-between items-center gap-2 my-8">
-                    <h1 className="text-3xl md:text-3xl font-bold">{isEditing ? "Edit Review" : "New Review"}</h1>
-                </div>
+                <Badge variant="secondary">{isEditing ? "2025, W33" : "New Review"}</Badge>
             </div>
 
             <div className="space-y-4">
@@ -248,13 +271,13 @@ const ReviewPage = () => {
                     <CollapsibleTrigger asChild>
                         <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                             <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
-                                <ChartBar /> Metrics
+                                <Activity /> General
                             </label>
                             {metricsOpen ? <ChevronDown /> : <ChevronRight />}
                         </Button>
                     </CollapsibleTrigger>
 
-                    <CollapsibleContent className="space-y-2 mt-6">
+                    <CollapsibleContent className="space-y-2 mt-6 mb-16">
                         <div className="space-y-2">
                             <div className="flex font-medium text-gray-500 text-sm justify-between items-center">
                                 <label>Health</label>
@@ -325,16 +348,91 @@ const ReviewPage = () => {
                     </CollapsibleContent>
                 </Collapsible>
 
+                <Collapsible open={numbersOpen} onOpenChange={setNumbersOpen}>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                            <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                <ChartBar /> Numbers
+                            </label>
+                            {numbersOpen ? <ChevronDown /> : <ChevronRight />}
+                        </Button>
+                    </CollapsibleTrigger>
+
+                    <CollapsibleContent className="space-y-4 mt-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-500">Cash (€)</label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={cash}
+                                onChange={(e) => setCash(e.target.value)}
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-500">Weight (kg)</label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={weight}
+                                onChange={(e) => setWeight(e.target.value)}
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-500">Screentime</label>
+                            <div className="flex gap-2">
+                                <div className="w-1/2">
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        placeholder="0"
+                                        value={screentimeHours}
+                                        onChange={(e) => setScreentimeHours(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                    <label className="text-xs text-gray-400 block mt-1">Hours</label>
+                                </div>
+                                <div className="w-1/2">
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        placeholder="0"
+                                        value={screentimeMinutes}
+                                        onChange={(e) => setScreentimeMinutes(e.target.value)}
+                                        disabled={loading}
+                                    />
+                                    <label className="text-xs text-gray-400 block mt-1">Minutes</label>
+                                </div>
+                            </div>
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
+
                 <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t">
                     <div className="flex justify-center gap-x-3">
-                        <Button className="w-1/2" variant="outline" onClick={() => navigate("/reviews")}>
-                            <X className="mr-2 h-4 w-4" />
-                            Cancel
-                        </Button>
-                        <Button className="w-1/2" onClick={handleSave} disabled={isSaving || !highlights.trim()}>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save
-                        </Button>
+                        {isEditing ? (
+                            <>
+                                <Button className="w-1/2" variant="outline" onClick={() => setDeleteDialogOpen(true)}>
+                                    <Trash className="mr-2 h-4 w-4" /> Delete
+                                </Button>
+                                <Button className="w-1/2" onClick={handleSave} disabled={isSaving || !highlights.trim()}>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    Save
+                                </Button>
+                            </>
+                        ) : (
+                            <Button className="w-full" onClick={handleSave} disabled={isSaving || !highlights.trim()}>
+                                <Save className="mr-2 h-4 w-4" />
+                                Save
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

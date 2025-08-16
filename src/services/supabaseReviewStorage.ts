@@ -57,6 +57,9 @@ export class SupabaseReviewStorage {
                 relationships: reviewData.relationships || 3,
                 progressing: reviewData.progressing || 3,
                 work: reviewData.work || 3,
+                cash: reviewData.cash || null,
+                weight: reviewData.weight || null,
+                screentime: reviewData.screentime || null,
             };
 
             const { data, error } = await supabase.from(this.tableName).insert([dbReview]).select().single();
