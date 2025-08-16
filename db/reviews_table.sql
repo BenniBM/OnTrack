@@ -33,3 +33,9 @@ CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews
 CREATE POLICY "Users can manage own reviews" ON reviews
     FOR ALL USING (auth.uid() IS NOT NULL)
     WITH CHECK (auth.uid() IS NOT NULL);
+
+
+-- 16.08.2025
+ALTER TABLE reviews 
+ADD COLUMN good TEXT,
+ADD COLUMN bad TEXT;

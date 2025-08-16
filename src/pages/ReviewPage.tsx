@@ -3,15 +3,21 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Edit3, Delete, Trash } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight } from "lucide-react";
 import supabase from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
 const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
+    const [good, setGood] = useState("");
+    const [bad, setBad] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [highlightsOpen, setHighlightsOpen] = useState(true);
+    const [goodOpen, setGoodOpen] = useState(false);
+    const [badOpen, setBadOpen] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
     const { id } = useParams<{ id: string }>();
@@ -36,7 +42,9 @@ const ReviewPage = () => {
             }
 
             if (data) {
-                setHighlights(data.highlights);
+                setHighlights(data.highlights || "");
+                setGood(data.good || "");
+                setBad(data.bad || "");
             }
         } catch (error) {
             console.error("Error loading review:", error);
@@ -70,6 +78,8 @@ const ReviewPage = () => {
                     .from("reviews")
                     .update({
                         highlights: highlights.trim(),
+                        good: good.trim(),
+                        bad: bad.trim(),
                         updated_at: new Date().toISOString(),
                     })
                     .eq("id", id);
@@ -79,6 +89,8 @@ const ReviewPage = () => {
                 const { error: insertError } = await supabase.from("reviews").insert([
                     {
                         highlights: highlights.trim(),
+                        good: good.trim(),
+                        bad: bad.trim(),
                         created_at: new Date().toISOString(),
                     },
                 ]);
@@ -130,19 +142,62 @@ const ReviewPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="space-y-2">
-                            <label htmlFor="highlights" className="text-2xl font-semibold">
-                                Highlights
-                            </label>
-                            <Textarea
-                                id="highlights"
-                                placeholder="Write down your highlights, achievements, or reflections for this review..."
-                                value={highlights}
-                                onChange={(e) => setHighlights(e.target.value)}
-                                className="min-h-[200px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
-                                disabled={loading}
-                            />
-                        </div>
+                        <Collapsible open={highlightsOpen} onOpenChange={setHighlightsOpen}>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                                    <label className="text-xl font-semibold cursor-pointer">🏆 Highlights</label>
+                                    {highlightsOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="space-y-2 mt-4">
+                                <Textarea
+                                    id="highlights"
+                                    placeholder="Write down your highlights, achievements, or reflections for this review..."
+                                    value={highlights}
+                                    onChange={(e) => setHighlights(e.target.value)}
+                                    className="min-h-[200px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                                    disabled={loading}
+                                />
+                            </CollapsibleContent>
+                        </Collapsible>
+
+                        <Collapsible open={goodOpen} onOpenChange={setGoodOpen}>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                                    <label className="text-xl font-semibold cursor-pointer">✅ What's Good?</label>
+                                    {goodOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="space-y-2 mt-4">
+                                <Textarea
+                                    id="good"
+                                    placeholder="What went well? What are you proud of? What positive experiences did you have?"
+                                    value={good}
+                                    onChange={(e) => setGood(e.target.value)}
+                                    className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                                    disabled={loading}
+                                />
+                            </CollapsibleContent>
+                        </Collapsible>
+
+                        <Collapsible open={badOpen} onOpenChange={setBadOpen}>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                                    <label className="text-xl font-semibold cursor-pointer">❌ What's Bad?</label>
+                                    {badOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="space-y-2 mt-4">
+                                <Textarea
+                                    id="bad"
+                                    placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
+                                    value={bad}
+                                    onChange={(e) => setBad(e.target.value)}
+                                    className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                                    disabled={loading}
+                                />
+                            </CollapsibleContent>
+                        </Collapsible>
 
                         <div className="flex justify-end space-x-3">
                             <Button variant="outline" onClick={() => navigate("/reviews")}>
