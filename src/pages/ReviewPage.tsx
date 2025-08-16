@@ -256,9 +256,9 @@ const ReviewPage = () => {
 
                     <CollapsibleContent className="space-y-2 mt-6">
                         <div className="space-y-2">
-                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                            <div className="flex font-medium text-gray-500 text-sm justify-between items-center">
                                 <label>Health</label>
-                                <span>{health[0]}/5</span>
+                                <span className="text-xs">{health[0]}/5</span>
                             </div>
                             <Slider
                                 color="bg-green-500"
@@ -273,9 +273,9 @@ const ReviewPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                            <div className="flex text-sm font-medium text-gray-500 justify-between items-center">
                                 <label>Relationships</label>
-                                <span>{relationships[0]}/5</span>
+                                <span className="text-xs">{relationships[0]}/5</span>
                             </div>
                             <Slider
                                 color="bg-yellow-500"
@@ -290,9 +290,9 @@ const ReviewPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                            <div className="flex text-sm font-medium text-gray-500 justify-between items-center">
                                 <label>Progressing</label>
-                                <span>{progressing[0]}/5</span>
+                                <span className="text-xs">{progressing[0]}/5</span>
                             </div>
                             <Slider
                                 color="bg-blue-500"
@@ -307,9 +307,9 @@ const ReviewPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                            <div className="flex text-sm font-medium text-gray-500 justify-between items-center">
                                 <label>Work</label>
-                                <span>{work[0]}/5</span>
+                                <span className="text-xs">{work[0]}/5</span>
                             </div>
                             <Slider
                                 color="bg-red-500"
