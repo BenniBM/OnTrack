@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar } from "lucide-react";
 import supabase from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
@@ -135,6 +136,8 @@ const ReviewPage = () => {
         }
     };
 
+    if (loading) return <LoadingSpinner />;
+
     return (
         <div className="container text-left py-4 md:py-8 px-4 md:px-8 max-w-2xl mx-auto">
             <div className="flex justify-between items-center mb-8">
@@ -154,167 +157,159 @@ const ReviewPage = () => {
             </div>
 
             <div className="space-y-4">
-                {loading ? (
-                    <div className="flex justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                    </div>
-                ) : (
-                    <>
-                        <Collapsible open={highlightsOpen} onOpenChange={setHighlightsOpen}>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
-                                        <Trophy height={40} width={40} /> Highlights
-                                    </label>
-                                    {highlightsOpen ? <ChevronDown /> : <ChevronRight />}
-                                </Button>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="space-y-2 mt-4">
-                                <Textarea
-                                    id="highlights"
-                                    placeholder="Write down your highlights, achievements, or reflections for this review..."
-                                    value={highlights}
-                                    onChange={(e) => setHighlights(e.target.value)}
-                                    className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
-                                    disabled={loading}
-                                />
-                            </CollapsibleContent>
-                        </Collapsible>
+                <Collapsible open={highlightsOpen} onOpenChange={setHighlightsOpen}>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                            <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                <Trophy height={40} width={40} /> Highlights
+                            </label>
+                            {highlightsOpen ? <ChevronDown /> : <ChevronRight />}
+                        </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-2 mt-4">
+                        <Textarea
+                            id="highlights"
+                            placeholder="Write down your highlights, achievements, or reflections for this review..."
+                            value={highlights}
+                            onChange={(e) => setHighlights(e.target.value)}
+                            className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                            disabled={loading}
+                        />
+                    </CollapsibleContent>
+                </Collapsible>
 
-                        <Collapsible open={goodOpen} onOpenChange={setGoodOpen}>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="font-semibold text-xl cursor-pointer flex items-center gap-2">
-                                        <CheckCircle2 /> What's Good?
-                                    </label>
-                                    {goodOpen ? <ChevronDown /> : <ChevronRight />}
-                                </Button>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="space-y-2 mt-4">
-                                <Textarea
-                                    id="good"
-                                    placeholder="What went well? What are you proud of? What positive experiences did you have?"
-                                    value={good}
-                                    onChange={(e) => setGood(e.target.value)}
-                                    className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
-                                    disabled={loading}
-                                />
-                            </CollapsibleContent>
-                        </Collapsible>
+                <Collapsible open={goodOpen} onOpenChange={setGoodOpen}>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                            <label className="font-semibold text-xl cursor-pointer flex items-center gap-2">
+                                <CheckCircle2 /> What's Good?
+                            </label>
+                            {goodOpen ? <ChevronDown /> : <ChevronRight />}
+                        </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-2 mt-4">
+                        <Textarea
+                            id="good"
+                            placeholder="What went well? What are you proud of? What positive experiences did you have?"
+                            value={good}
+                            onChange={(e) => setGood(e.target.value)}
+                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                            disabled={loading}
+                        />
+                    </CollapsibleContent>
+                </Collapsible>
 
-                        <Collapsible open={badOpen} onOpenChange={setBadOpen}>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
-                                        <XCircle /> What's Bad?
-                                    </label>
-                                    {badOpen ? <ChevronDown /> : <ChevronRight />}
-                                </Button>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="space-y-2 mt-4">
-                                <Textarea
-                                    id="bad"
-                                    placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
-                                    value={bad}
-                                    onChange={(e) => setBad(e.target.value)}
-                                    className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
-                                    disabled={loading}
-                                />
-                            </CollapsibleContent>
-                        </Collapsible>
+                <Collapsible open={badOpen} onOpenChange={setBadOpen}>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                            <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                <XCircle /> What's Bad?
+                            </label>
+                            {badOpen ? <ChevronDown /> : <ChevronRight />}
+                        </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-2 mt-4">
+                        <Textarea
+                            id="bad"
+                            placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
+                            value={bad}
+                            onChange={(e) => setBad(e.target.value)}
+                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                            disabled={loading}
+                        />
+                    </CollapsibleContent>
+                </Collapsible>
 
-                        <Collapsible open={metricsOpen} onOpenChange={setMetricsOpen}>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
-                                        <ChartBar /> Metrics
-                                    </label>
-                                    {metricsOpen ? <ChevronDown /> : <ChevronRight />}
-                                </Button>
-                            </CollapsibleTrigger>
+                <Collapsible open={metricsOpen} onOpenChange={setMetricsOpen}>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                            <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                <ChartBar /> Metrics
+                            </label>
+                            {metricsOpen ? <ChevronDown /> : <ChevronRight />}
+                        </Button>
+                    </CollapsibleTrigger>
 
-                            <CollapsibleContent className="space-y-2 mt-6">
-                                <div className="space-y-2">
-                                    <div className="flex font-medium text-gray-500 justify-between items-center">
-                                        <label>Health</label>
-                                        <span>{health[0]}/5</span>
-                                    </div>
-                                    <Slider
-                                        color="bg-green-500"
-                                        value={health}
-                                        onValueChange={setHealth}
-                                        max={5}
-                                        min={1}
-                                        step={1}
-                                        className="w-full"
-                                        disabled={loading}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex font-medium text-gray-500 justify-between items-center">
-                                        <label>Relationships</label>
-                                        <span>{relationships[0]}/5</span>
-                                    </div>
-                                    <Slider
-                                        color="bg-yellow-500"
-                                        value={relationships}
-                                        onValueChange={setRelationships}
-                                        max={5}
-                                        min={1}
-                                        step={1}
-                                        className="w-full"
-                                        disabled={loading}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex font-medium text-gray-500 justify-between items-center">
-                                        <label>Progressing</label>
-                                        <span>{progressing[0]}/5</span>
-                                    </div>
-                                    <Slider
-                                        color="bg-blue-500"
-                                        value={progressing}
-                                        onValueChange={setProgressing}
-                                        max={5}
-                                        min={1}
-                                        step={1}
-                                        className="w-full"
-                                        disabled={loading}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex font-medium text-gray-500 justify-between items-center">
-                                        <label>Work</label>
-                                        <span>{work[0]}/5</span>
-                                    </div>
-                                    <Slider
-                                        color="bg-red-500"
-                                        value={work}
-                                        onValueChange={setWork}
-                                        max={5}
-                                        min={1}
-                                        step={1}
-                                        className="w-full"
-                                        disabled={loading}
-                                    />
-                                </div>
-                            </CollapsibleContent>
-                        </Collapsible>
-
-                        <div className="flex pt-8 justify-end space-x-3">
-                            <Button variant="outline" onClick={() => navigate("/reviews")}>
-                                Cancel
-                            </Button>
-                            <Button onClick={handleSave} disabled={isSaving || !highlights.trim()}>
-                                <Save className="mr-2 h-4 w-4" />
-                                {isSaving ? "Saving..." : isEditing ? "Update Review" : "Save Review"}
-                            </Button>
+                    <CollapsibleContent className="space-y-2 mt-6">
+                        <div className="space-y-2">
+                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                                <label>Health</label>
+                                <span>{health[0]}/5</span>
+                            </div>
+                            <Slider
+                                color="bg-green-500"
+                                value={health}
+                                onValueChange={setHealth}
+                                max={5}
+                                min={1}
+                                step={1}
+                                className="w-full"
+                                disabled={loading}
+                            />
                         </div>
-                    </>
-                )}
+
+                        <div className="space-y-2">
+                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                                <label>Relationships</label>
+                                <span>{relationships[0]}/5</span>
+                            </div>
+                            <Slider
+                                color="bg-yellow-500"
+                                value={relationships}
+                                onValueChange={setRelationships}
+                                max={5}
+                                min={1}
+                                step={1}
+                                className="w-full"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                                <label>Progressing</label>
+                                <span>{progressing[0]}/5</span>
+                            </div>
+                            <Slider
+                                color="bg-blue-500"
+                                value={progressing}
+                                onValueChange={setProgressing}
+                                max={5}
+                                min={1}
+                                step={1}
+                                className="w-full"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex font-medium text-gray-500 justify-between items-center">
+                                <label>Work</label>
+                                <span>{work[0]}/5</span>
+                            </div>
+                            <Slider
+                                color="bg-red-500"
+                                value={work}
+                                onValueChange={setWork}
+                                max={5}
+                                min={1}
+                                step={1}
+                                className="w-full"
+                                disabled={loading}
+                            />
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
+
+                <div className="flex pt-8 justify-end space-x-3">
+                    <Button variant="outline" onClick={() => navigate("/reviews")}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSave} disabled={isSaving || !highlights.trim()}>
+                        <Save className="mr-2 h-4 w-4" />
+                        {isSaving ? "Saving..." : isEditing ? "Update Review" : "Save Review"}
+                    </Button>
+                </div>
             </div>
         </div>
     );

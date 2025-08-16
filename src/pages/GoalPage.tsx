@@ -25,7 +25,6 @@ const GoalPage = () => {
     const [newTask, setNewTask] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { goals, loading, error, updateGoal, deleteGoal, updateSubtasks, updateProgressLogs, updateCurrentValue } = useSupabaseGoals();
-    const { user, loading: authLoading } = useAuth();
     const goal = goals?.find((g) => g.id === id);
     const [goalState, setGoalState] = useState<Goal | null>(null);
 
@@ -46,7 +45,7 @@ const GoalPage = () => {
         }
     }, [goal]);
 
-    if (authLoading || loading) return <LoadingSpinner />;
+    if (loading) return <LoadingSpinner />;
     if (error) return <div className="container py-8 px-4 text-center text-red-500">Error: {error}</div>;
     if (!goals) return null;
 
