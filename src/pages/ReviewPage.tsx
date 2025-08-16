@@ -23,6 +23,7 @@ const ReviewPage = () => {
     const [highlightsOpen, setHighlightsOpen] = useState(true);
     const [goodOpen, setGoodOpen] = useState(false);
     const [badOpen, setBadOpen] = useState(false);
+    const [metricsOpen, setMetricsOpen] = useState(true);
     const navigate = useNavigate();
     const { toast } = useToast();
     const { id } = useParams<{ id: string }>();
@@ -205,7 +206,7 @@ const ReviewPage = () => {
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                                     <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
-                                        <XCircle className="h-5 w-5" /> What's Bad?
+                                        <XCircle /> What's Bad?
                                     </label>
                                     {badOpen ? <ChevronDown /> : <ChevronRight />}
                                 </Button>
@@ -222,12 +223,17 @@ const ReviewPage = () => {
                             </CollapsibleContent>
                         </Collapsible>
 
-                        <div className="space-y-6 pt-4">
-                            <h2 className="text-xl font-semibold flex items-center gap-2">
-                                <ChartBar /> Metrics
-                            </h2>
+                        <Collapsible open={metricsOpen} onOpenChange={setMetricsOpen}>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                                    <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                        <ChartBar /> Metrics
+                                    </label>
+                                    {metricsOpen ? <ChevronDown /> : <ChevronRight />}
+                                </Button>
+                            </CollapsibleTrigger>
 
-                            <div className="space-y-6">
+                            <CollapsibleContent className="space-y-2 mt-6">
                                 <div className="space-y-2">
                                     <div className="flex font-medium text-gray-500 justify-between items-center">
                                         <label>Health</label>
@@ -295,8 +301,8 @@ const ReviewPage = () => {
                                         disabled={loading}
                                     />
                                 </div>
-                            </div>
-                        </div>
+                            </CollapsibleContent>
+                        </Collapsible>
 
                         <div className="flex pt-8 justify-end space-x-3">
                             <Button variant="outline" onClick={() => navigate("/reviews")}>
