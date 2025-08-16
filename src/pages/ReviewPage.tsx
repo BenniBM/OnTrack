@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar } from "lucide-react";
 import supabase from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +13,10 @@ const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
     const [good, setGood] = useState("");
     const [bad, setBad] = useState("");
+    const [health, setHealth] = useState([3]);
+    const [relationships, setRelationships] = useState([3]);
+    const [progressing, setProgressing] = useState([3]);
+    const [work, setWork] = useState([3]);
     const [isSaving, setIsSaving] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -45,6 +50,10 @@ const ReviewPage = () => {
                 setHighlights(data.highlights || "");
                 setGood(data.good || "");
                 setBad(data.bad || "");
+                setHealth([data.health || 3]);
+                setRelationships([data.relationships || 3]);
+                setProgressing([data.progressing || 3]);
+                setWork([data.work || 3]);
             }
         } catch (error) {
             console.error("Error loading review:", error);
@@ -80,6 +89,10 @@ const ReviewPage = () => {
                         highlights: highlights.trim(),
                         good: good.trim(),
                         bad: bad.trim(),
+                        health: health[0],
+                        relationships: relationships[0],
+                        progressing: progressing[0],
+                        work: work[0],
                         updated_at: new Date().toISOString(),
                     })
                     .eq("id", id);
@@ -91,6 +104,10 @@ const ReviewPage = () => {
                         highlights: highlights.trim(),
                         good: good.trim(),
                         bad: bad.trim(),
+                        health: health[0],
+                        relationships: relationships[0],
+                        progressing: progressing[0],
+                        work: work[0],
                         created_at: new Date().toISOString(),
                     },
                 ]);
@@ -145,8 +162,10 @@ const ReviewPage = () => {
                         <Collapsible open={highlightsOpen} onOpenChange={setHighlightsOpen}>
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="text-xl font-semibold cursor-pointer">🏆 Highlights</label>
-                                    {highlightsOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                    <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                        <Trophy height={40} width={40} /> Highlights
+                                    </label>
+                                    {highlightsOpen ? <ChevronDown /> : <ChevronRight />}
                                 </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="space-y-2 mt-4">
@@ -155,7 +174,7 @@ const ReviewPage = () => {
                                     placeholder="Write down your highlights, achievements, or reflections for this review..."
                                     value={highlights}
                                     onChange={(e) => setHighlights(e.target.value)}
-                                    className="min-h-[200px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                                    className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
                                     disabled={loading}
                                 />
                             </CollapsibleContent>
@@ -164,8 +183,10 @@ const ReviewPage = () => {
                         <Collapsible open={goodOpen} onOpenChange={setGoodOpen}>
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="text-xl font-semibold cursor-pointer">✅ What's Good?</label>
-                                    {goodOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                    <label className="font-semibold text-xl cursor-pointer flex items-center gap-2">
+                                        <CheckCircle2 /> What's Good?
+                                    </label>
+                                    {goodOpen ? <ChevronDown /> : <ChevronRight />}
                                 </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="space-y-2 mt-4">
@@ -183,8 +204,10 @@ const ReviewPage = () => {
                         <Collapsible open={badOpen} onOpenChange={setBadOpen}>
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                    <label className="text-xl font-semibold cursor-pointer">❌ What's Bad?</label>
-                                    {badOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+                                    <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                                        <XCircle className="h-5 w-5" /> What's Bad?
+                                    </label>
+                                    {badOpen ? <ChevronDown /> : <ChevronRight />}
                                 </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="space-y-2 mt-4">
@@ -199,7 +222,83 @@ const ReviewPage = () => {
                             </CollapsibleContent>
                         </Collapsible>
 
-                        <div className="flex justify-end space-x-3">
+                        <div className="space-y-6 pt-4">
+                            <h2 className="text-xl font-semibold flex items-center gap-2">
+                                <ChartBar /> Metrics
+                            </h2>
+
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <div className="flex font-medium text-gray-500 justify-between items-center">
+                                        <label>Health</label>
+                                        <span>{health[0]}/5</span>
+                                    </div>
+                                    <Slider
+                                        color="bg-green-500"
+                                        value={health}
+                                        onValueChange={setHealth}
+                                        max={5}
+                                        min={1}
+                                        step={1}
+                                        className="w-full"
+                                        disabled={loading}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex font-medium text-gray-500 justify-between items-center">
+                                        <label>Relationships</label>
+                                        <span>{relationships[0]}/5</span>
+                                    </div>
+                                    <Slider
+                                        color="bg-yellow-500"
+                                        value={relationships}
+                                        onValueChange={setRelationships}
+                                        max={5}
+                                        min={1}
+                                        step={1}
+                                        className="w-full"
+                                        disabled={loading}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex font-medium text-gray-500 justify-between items-center">
+                                        <label>Progressing</label>
+                                        <span>{progressing[0]}/5</span>
+                                    </div>
+                                    <Slider
+                                        color="bg-blue-500"
+                                        value={progressing}
+                                        onValueChange={setProgressing}
+                                        max={5}
+                                        min={1}
+                                        step={1}
+                                        className="w-full"
+                                        disabled={loading}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex font-medium text-gray-500 justify-between items-center">
+                                        <label>Work</label>
+                                        <span>{work[0]}/5</span>
+                                    </div>
+                                    <Slider
+                                        color="bg-red-500"
+                                        value={work}
+                                        onValueChange={setWork}
+                                        max={5}
+                                        min={1}
+                                        step={1}
+                                        className="w-full"
+                                        disabled={loading}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex pt-8 justify-end space-x-3">
                             <Button variant="outline" onClick={() => navigate("/reviews")}>
                                 Cancel
                             </Button>
