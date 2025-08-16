@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar } from "lucide-react";
-import supabase from "@/lib/supabase";
+import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useSupabaseReviews } from "@/hooks/useSupabaseReviews";
+import { CreateReviewData, UpdateReviewData } from "@/types/review";
 
 const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
@@ -28,6 +29,7 @@ const ReviewPage = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const { id } = useParams<{ id: string }>();
+    const { addReview, updateReview, deleteReview, getReviewById, loading: hookLoading } = useSupabaseReviews();
 
     // Load existing review data if editing
     useEffect(() => {
@@ -42,20 +44,16 @@ const ReviewPage = () => {
 
         setLoading(true);
         try {
-            const { data, error } = await supabase.from("reviews").select("*").eq("id", id).single();
+            const review = await getReviewById(id);
 
-            if (error) {
-                throw error;
-            }
-
-            if (data) {
-                setHighlights(data.highlights || "");
-                setGood(data.good || "");
-                setBad(data.bad || "");
-                setHealth([data.health || 3]);
-                setRelationships([data.relationships || 3]);
-                setProgressing([data.progressing || 3]);
-                setWork([data.work || 3]);
+            if (review) {
+                setHighlights(review.highlights || "");
+                setGood(review.good || "");
+                setBad(review.bad || "");
+                setHealth([review.health || 3]);
+                setRelationships([review.relationships || 3]);
+                setProgressing([review.progressing || 3]);
+                setWork([review.work || 3]);
             }
         } catch (error) {
             console.error("Error loading review:", error);
@@ -81,49 +79,40 @@ const ReviewPage = () => {
 
         setIsSaving(true);
         try {
-            let error;
+            let result;
 
             if (isEditing && id) {
                 // Update existing review
-                const { error: updateError } = await supabase
-                    .from("reviews")
-                    .update({
-                        highlights: highlights.trim(),
-                        good: good.trim(),
-                        bad: bad.trim(),
-                        health: health[0],
-                        relationships: relationships[0],
-                        progressing: progressing[0],
-                        work: work[0],
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq("id", id);
-                error = updateError;
+                const updateData: UpdateReviewData = {
+                    id,
+                    highlights: highlights.trim(),
+                    good: good.trim() || undefined,
+                    bad: bad.trim() || undefined,
+                    health: health[0],
+                    relationships: relationships[0],
+                    progressing: progressing[0],
+                    work: work[0],
+                };
+                result = await updateReview(updateData);
             } else {
                 // Create new review
-                const { error: insertError } = await supabase.from("reviews").insert([
-                    {
-                        highlights: highlights.trim(),
-                        good: good.trim(),
-                        bad: bad.trim(),
-                        health: health[0],
-                        relationships: relationships[0],
-                        progressing: progressing[0],
-                        work: work[0],
-                        created_at: new Date().toISOString(),
-                    },
-                ]);
-                error = insertError;
+                const createData: CreateReviewData = {
+                    highlights: highlights.trim(),
+                    good: good.trim() || undefined,
+                    bad: bad.trim() || undefined,
+                    health: health[0],
+                    relationships: relationships[0],
+                    progressing: progressing[0],
+                    work: work[0],
+                };
+                result = await addReview(createData);
             }
 
-            if (error) {
-                throw error;
+            if (result) {
+                console.log(result);
+            } else {
+                throw new Error("Failed to save review");
             }
-
-            toast({
-                title: "Success",
-                description: isEditing ? "Review updated successfully!" : "Review saved successfully!",
-            });
         } catch (error) {
             console.error("Error saving review:", error);
             toast({
@@ -136,16 +125,47 @@ const ReviewPage = () => {
         }
     };
 
-    if (loading) return <LoadingSpinner />;
+    const handleDelete = async () => {
+        if (!id || !isEditing) return;
+
+        if (!confirm("Are you sure you want to delete this review? This action cannot be undone.")) {
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const success = await deleteReview(id);
+            if (success) {
+                toast({
+                    title: "Success",
+                    description: "Review deleted successfully!",
+                });
+                navigate("/reviews");
+            } else {
+                throw new Error("Failed to delete review");
+            }
+        } catch (error) {
+            console.error("Error deleting review:", error);
+            toast({
+                title: "Error",
+                description: "Failed to delete review. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    if (loading || hookLoading) return <LoadingSpinner />;
 
     return (
-        <div className="container text-left py-4 md:py-8 px-4 md:px-8 max-w-2xl mx-auto">
+        <div className="container text-left py-4 md:py-8 px-4 md:px-8 mb-20 max-w-2xl mx-auto">
             <div className="flex justify-between items-center mb-8">
                 <Button variant="ghost" onClick={() => navigate("/reviews")} className="pl-0 hover:bg-transparent hover:text-muted-foreground">
                     <ArrowLeft className="h-4 w-4" />
                     Back
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleDelete} disabled={!isEditing}>
                     <Trash className="mr-2 h-4 w-4" /> Delete
                 </Button>
             </div>
@@ -301,14 +321,17 @@ const ReviewPage = () => {
                     </CollapsibleContent>
                 </Collapsible>
 
-                <div className="flex pt-8 justify-end space-x-3">
-                    <Button variant="outline" onClick={() => navigate("/reviews")}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSave} disabled={isSaving || !highlights.trim()}>
-                        <Save className="mr-2 h-4 w-4" />
-                        {isSaving ? "Saving..." : isEditing ? "Update Review" : "Save Review"}
-                    </Button>
+                <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t">
+                    <div className="flex justify-center gap-x-3">
+                        <Button className="w-1/2" variant="outline" onClick={() => navigate("/reviews")}>
+                            <X className="mr-2 h-4 w-4" />
+                            Cancel
+                        </Button>
+                        <Button className="w-1/2" onClick={handleSave} disabled={isSaving || !highlights.trim()}>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

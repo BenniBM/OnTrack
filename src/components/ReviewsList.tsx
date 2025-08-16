@@ -1,55 +1,26 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "./LoadingSpinner";
-import supabase from "@/lib/supabase";
 import { format } from "date-fns";
-
-interface Review {
-    id: string;
-    highlights: string;
-    created_at: string;
-}
+import { useSupabaseReviews } from "@/hooks/useSupabaseReviews";
+import { Review } from "@/types/review";
 
 const ReviewsList = () => {
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { reviews, loading, error, refetch } = useSupabaseReviews();
     const location = useLocation();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        fetchReviews();
-    }, []);
 
     useEffect(() => {
         // Check if we should refresh (e.g., after adding a new review)
         const searchParams = new URLSearchParams(location.search);
         if (searchParams.get("refresh") === "true") {
-            fetchReviews();
+            refetch();
             // Clean up the URL
             window.history.replaceState({}, "", "/reviews");
         }
-    }, [location.search]);
-
-    const fetchReviews = async () => {
-        try {
-            setLoading(true);
-            const { data, error } = await supabase.from("reviews").select("*").order("created_at", { ascending: false });
-
-            if (error) {
-                throw error;
-            }
-
-            setReviews(data || []);
-        } catch (err) {
-            console.error("Error fetching reviews:", err);
-            setError("Failed to load reviews");
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [location.search, refetch]);
 
     if (loading) {
         return (
@@ -63,7 +34,7 @@ const ReviewsList = () => {
         return (
             <div className="text-center py-8">
                 <p className="text-red-500">{error}</p>
-                <button onClick={fetchReviews} className="mt-2 text-blue-500 hover:underline">
+                <button onClick={refetch} className="mt-2 text-blue-500 hover:underline">
                     Try again
                 </button>
             </div>
@@ -90,7 +61,7 @@ const ReviewsList = () => {
                     </CardHeader>
                     <CardContent className="px-4 md:px-6">
                         <div className="space-y-2">
-                            <Badge variant="secondary">{format(new Date(review.created_at), "MMM dd, yyyy")}</Badge>
+                            <Badge variant="secondary">{format(new Date(review.createdAt), "MMM dd, yyyy")}</Badge>
                         </div>
                     </CardContent>
                 </Card>
