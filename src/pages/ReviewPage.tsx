@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { ArrowLeft, Save, Edit3, Delete, Trash, ChevronDown, ChevronRight, Trophy, CheckCircle2, XCircle, ChartBar, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -27,6 +28,7 @@ const ReviewPage = () => {
     const [goodOpen, setGoodOpen] = useState(false);
     const [badOpen, setBadOpen] = useState(false);
     const [metricsOpen, setMetricsOpen] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
     const { id } = useParams<{ id: string }>();
@@ -134,10 +136,6 @@ const ReviewPage = () => {
     const handleDelete = async () => {
         if (!id || !isEditing) return;
 
-        if (!confirm("Are you sure you want to delete this review? This action cannot be undone.")) {
-            return;
-        }
-
         setIsSaving(true);
         try {
             const success = await deleteReview(id);
@@ -171,7 +169,7 @@ const ReviewPage = () => {
                     <ArrowLeft className="h-4 w-4" />
                     Back
                 </Button>
-                <Button variant="outline" onClick={handleDelete} disabled={!isEditing}>
+                <Button variant="outline" onClick={() => setDeleteDialogOpen(true)} disabled={!isEditing}>
                     <Trash className="mr-2 h-4 w-4" /> Delete
                 </Button>
             </div>
@@ -340,6 +338,21 @@ const ReviewPage = () => {
                     </div>
                 </div>
             </div>
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogDescription>Are you sure you want to delete this review? This action cannot be undone.</DialogDescription>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
