@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,11 @@ const ReviewPage = () => {
     const { toast } = useToast();
     const { id } = useParams<{ id: string }>();
     const { addReview, updateReview, deleteReview, getReviewById, loading: hookLoading } = useSupabaseReviews();
+
+    // Helper function to convert dashes to bullet points
+    const convertDashesToBullets = (text: string) => {
+        return text.replace(/-/g, "•");
+    };
 
     // Load existing review data if editing
     useEffect(() => {
@@ -191,7 +197,7 @@ const ReviewPage = () => {
                             id="highlights"
                             placeholder="Write down your highlights, achievements, or reflections for this review..."
                             value={highlights}
-                            onChange={(e) => setHighlights(e.target.value)}
+                            onChange={(e) => setHighlights(convertDashesToBullets(e.target.value))}
                             className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
                             disabled={loading}
                         />
@@ -212,7 +218,7 @@ const ReviewPage = () => {
                             id="good"
                             placeholder="What went well? What are you proud of? What positive experiences did you have?"
                             value={good}
-                            onChange={(e) => setGood(e.target.value)}
+                            onChange={(e) => setGood(convertDashesToBullets(e.target.value))}
                             className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
                             disabled={loading}
                         />
@@ -233,7 +239,7 @@ const ReviewPage = () => {
                             id="bad"
                             placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
                             value={bad}
-                            onChange={(e) => setBad(e.target.value)}
+                            onChange={(e) => setBad(convertDashesToBullets(e.target.value))}
                             className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
                             disabled={loading}
                         />
