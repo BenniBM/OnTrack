@@ -6,6 +6,7 @@ import { LoadingSpinner } from "./LoadingSpinner";
 import { format } from "date-fns";
 import { useSupabaseReviews } from "@/hooks/useSupabaseReviews";
 import { Review } from "@/types/review";
+import { getWeekNumber } from "@/utils/weekUtils";
 
 const ReviewsList = () => {
     const { reviews, loading, error, refetch } = useSupabaseReviews();
@@ -51,21 +52,27 @@ const ReviewsList = () => {
 
     return (
         <div className="space-y-4 text-left">
-            {reviews.map((review) => (
-                <Card
-                    key={review.id}
-                    className="hover:shadow-md transition-shadow cursor-pointer hover:bg-gray-50"
-                    onClick={() => navigate(`/review/${review.id}`)}>
-                    <CardHeader className="pb-2 px-4 md:px-6">
-                        <CardTitle className="text-2xl md:text-2xl font-bold">Review #{reviews.indexOf(review) + 1}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-4 md:px-6">
-                        <div className="space-y-2">
-                            <Badge variant="secondary">{format(new Date(review.createdAt), "MMM dd, yyyy")}</Badge>
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
+            {reviews.map((review) => {
+                const reviewDate = new Date(review.createdAt);
+                const weekNumber = getWeekNumber(reviewDate);
+                const year = reviewDate.getFullYear();
+
+                return (
+                    <Card
+                        key={review.id}
+                        className="hover:shadow-md transition-shadow cursor-pointer hover:bg-gray-50"
+                        onClick={() => navigate(`/review/${review.id}`)}>
+                        <CardHeader className="pb-2 px-4 md:px-6">
+                            <CardTitle className="text-2xl md:text-2xl font-bold">Week {weekNumber.toString().padStart(2, "0")}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="px-4 md:px-6">
+                            <div className="space-y-2">
+                                <Badge variant="secondary">{format(reviewDate, "dd. MMMM yyyy")}</Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
+                );
+            })}
         </div>
     );
 };

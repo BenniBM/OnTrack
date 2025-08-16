@@ -15,6 +15,7 @@ import { useSupabaseReviews } from "@/hooks/useSupabaseReviews";
 import { CreateReviewData, UpdateReviewData } from "@/types/review";
 import { FormItem, FormLabel } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
+import { formatYearWeek } from "@/utils/weekUtils";
 
 const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
@@ -37,6 +38,7 @@ const ReviewPage = () => {
     const [badOpen, setBadOpen] = useState(false);
     const [metricsOpen, setMetricsOpen] = useState(true);
     const [numbersOpen, setNumbersOpen] = useState(false);
+    const [createdAt, setCreatedAt] = useState<Date | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -64,6 +66,7 @@ const ReviewPage = () => {
             const review = await getReviewById(id);
 
             if (review) {
+                setCreatedAt(new Date(review.createdAt));
                 setHighlights(review.highlights || "");
                 setGood(review.good || "");
                 setBad(review.bad || "");
@@ -200,7 +203,7 @@ const ReviewPage = () => {
                     <ArrowLeft className="h-4 w-4" />
                     Back
                 </Button>
-                <Badge variant="secondary">{isEditing ? "2025, W33" : "New Review"}</Badge>
+                <Badge variant="secondary">{isEditing ? formatYearWeek(createdAt) : "New Review"}</Badge>
             </div>
 
             <div className="space-y-4">
