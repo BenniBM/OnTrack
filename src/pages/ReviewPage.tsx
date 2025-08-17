@@ -98,6 +98,20 @@ const ReviewPage = () => {
         });
     }, [highlightsOpen, goodOpen, badOpen, highlights, good, bad]);
 
+    // Handle initial height calculation after component is fully mounted and data is loaded
+    useEffect(() => {
+        if (!loading && highlights) {
+            // Single calculation after everything is ready
+            const timeoutId = setTimeout(() => {
+                if (highlightsOpen) adjustTextareaHeight("highlights", highlights);
+                if (goodOpen) adjustTextareaHeight("good", good);
+                if (badOpen) adjustTextareaHeight("bad", bad);
+            }, 200);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [loading, highlights, good, bad, highlightsOpen, goodOpen, badOpen]);
+
     const loadReview = async () => {
         if (!id) return;
 
