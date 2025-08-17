@@ -50,6 +50,24 @@ const ReviewPage = () => {
         return text.replace(/-/g, "•");
     };
 
+    // Helper function to adjust textarea height
+    const adjustTextareaHeight = (elementId: string, content: string) => {
+        const textarea = document.getElementById(elementId) as HTMLTextAreaElement;
+        if (textarea) {
+            textarea.style.height = "auto";
+            textarea.style.height = Math.max(70, textarea.scrollHeight) + "px";
+        }
+    };
+
+    // Helper function to handle textarea input height adjustment
+    const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+        const target = e.target as HTMLTextAreaElement;
+        const newHeight = Math.max(70, target.scrollHeight);
+        if (Math.abs(parseInt(target.style.height || "0") - newHeight) > 5) {
+            target.style.height = newHeight + "px";
+        }
+    };
+
     // Load existing review data if editing
     useEffect(() => {
         if (id) {
@@ -57,6 +75,28 @@ const ReviewPage = () => {
             loadReview();
         }
     }, [id]);
+
+    // Adjust textarea heights when content changes
+    useEffect(() => {
+        adjustTextareaHeight("highlights", highlights);
+        adjustTextareaHeight("good", good);
+        adjustTextareaHeight("bad", bad);
+    }, [highlights, good, bad]);
+
+    // Recalculate heights when collapsible sections are opened (to fix scrollable issue)
+    useEffect(() => {
+        const sections = [
+            { isOpen: highlightsOpen, id: "highlights", content: highlights },
+            { isOpen: goodOpen, id: "good", content: good },
+            { isOpen: badOpen, id: "bad", content: bad },
+        ];
+
+        sections.forEach(({ isOpen, id, content }) => {
+            if (isOpen) {
+                requestAnimationFrame(() => adjustTextareaHeight(id, content));
+            }
+        });
+    }, [highlightsOpen, goodOpen, badOpen, highlights, good, bad]);
 
     const loadReview = async () => {
         if (!id) return;
@@ -216,14 +256,17 @@ const ReviewPage = () => {
                             {highlightsOpen ? <ChevronDown /> : <ChevronRight />}
                         </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 mt-4">
+                    <CollapsibleContent className="space-y-2 mb-6 mt-2">
                         <Textarea
                             id="highlights"
                             placeholder="Write down your highlights, achievements, or reflections for this review..."
                             value={highlights}
                             onChange={(e) => setHighlights(convertDashesToBullets(e.target.value))}
-                            className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                            className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
+                            rows={Math.max(2, highlights.split("\n").length)}
+                            style={{ height: "auto", minHeight: "70px" }}
+                            onInput={handleTextareaInput}
                         />
                     </CollapsibleContent>
                 </Collapsible>
@@ -237,14 +280,17 @@ const ReviewPage = () => {
                             {goodOpen ? <ChevronDown /> : <ChevronRight />}
                         </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 mt-4">
+                    <CollapsibleContent className="space-y-2 mb-6 mt-2">
                         <Textarea
                             id="good"
                             placeholder="What went well? What are you proud of? What positive experiences did you have?"
                             value={good}
                             onChange={(e) => setGood(convertDashesToBullets(e.target.value))}
-                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
+                            rows={Math.max(2, good.split("\n").length)}
+                            style={{ height: "auto", minHeight: "70px" }}
+                            onInput={handleTextareaInput}
                         />
                     </CollapsibleContent>
                 </Collapsible>
@@ -258,14 +304,17 @@ const ReviewPage = () => {
                             {badOpen ? <ChevronDown /> : <ChevronRight />}
                         </Button>
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 mt-4">
+                    <CollapsibleContent className="space-y-2 mb-6 mt-2">
                         <Textarea
                             id="bad"
                             placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
                             value={bad}
                             onChange={(e) => setBad(convertDashesToBullets(e.target.value))}
-                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0"
+                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
+                            rows={Math.max(2, bad.split("\n").length)}
+                            style={{ height: "auto", minHeight: "70px" }}
+                            onInput={handleTextareaInput}
                         />
                     </CollapsibleContent>
                 </Collapsible>
