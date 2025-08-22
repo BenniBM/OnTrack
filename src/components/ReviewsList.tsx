@@ -51,16 +51,15 @@ const ReviewsList = () => {
     }
 
     return (
-        <div className="space-y-4 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 w-full lg:grid-cols-3 gap-4 md:gap-6 mb-6">
             {reviews.map((review) => {
                 const reviewDate = new Date(review.createdAt);
                 const weekNumber = getWeekNumber(reviewDate);
-                const year = reviewDate.getFullYear();
 
                 return (
                     <Card
                         key={review.id}
-                        className="hover:shadow-md transition-shadow cursor-pointer hover:bg-gray-50"
+                        className="hover:shadow-md text-left transition-shadow cursor-pointer hover:bg-gray-50"
                         onClick={() => navigate(`/review/${review.id}`)}>
                         <CardHeader className="pb-2 px-4 md:px-6">
                             <CardTitle className="text-2xl md:text-2xl font-bold">Week {weekNumber.toString().padStart(2, "0")}</CardTitle>

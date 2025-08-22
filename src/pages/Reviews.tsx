@@ -15,9 +15,7 @@ const ReviewsPage = () => {
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
             {/* Reviews List */}
-            <div className="max-w-4xl mx-auto">
-                <ReviewsList />
-            </div>
+            <ReviewsList />
 
             {/* Floating Action Button for Add Review */}
             <div className="fixed bottom-6 right-6 z-50">

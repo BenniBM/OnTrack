@@ -251,7 +251,7 @@ const ReviewPage = () => {
     if (loading || hookLoading) return <LoadingSpinner />;
 
     return (
-        <div className="container text-left py-4 md:py-8 px-4 md:px-8 mb-20 max-w-2xl mx-auto">
+        <div className="container text-left py-4 md:py-8 px-4 md:px-8 mb-20 max-w-4xl mx-auto">
             <div className="flex justify-between items-center mb-8">
                 <Button variant="ghost" onClick={() => navigate("/reviews")} className="pl-0 hover:bg-transparent hover:text-muted-foreground">
                     <ArrowLeft className="h-4 w-4" />
@@ -481,7 +481,7 @@ const ReviewPage = () => {
                     </CollapsibleContent>
                 </Collapsible>
 
-                <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t">
+                <div className="fixed bottom-0 md:max-w-4xl mx-auto md:border-t-0 left-0 right-0 bg-white p-4 border-t">
                     <div className="flex justify-center gap-x-3">
                         {isEditing ? (
                             <>
