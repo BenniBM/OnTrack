@@ -34,10 +34,10 @@ const ReviewPage = () => {
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [highlightsOpen, setHighlightsOpen] = useState(true);
-    const [goodOpen, setGoodOpen] = useState(false);
-    const [badOpen, setBadOpen] = useState(false);
+    const [goodOpen, setGoodOpen] = useState(true);
+    const [badOpen, setBadOpen] = useState(true);
     const [metricsOpen, setMetricsOpen] = useState(true);
-    const [numbersOpen, setNumbersOpen] = useState(false);
+    const [numbersOpen, setNumbersOpen] = useState(true);
     const [createdAt, setCreatedAt] = useState<Date | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const navigate = useNavigate();
