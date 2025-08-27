@@ -43,6 +43,106 @@ const getProgressValueForDate = (date: Date, progressLogs: Goal["progressLogs"],
 };
 
 export const ProgressGraph: React.FC<ProgressGraphProps> = ({ goal }) => {
+    // For metric goals, show a simplified view without progress tracking
+    if (goal.metric) {
+        return (
+            <div className="space-y-4">
+                <div className="text-left">
+                    <h2 className="text-2xl font-semibold">Metric Overview</h2>
+                    <p className="text-sm mb-8 text-muted-foreground">
+                        {format(new Date(goal.startDate), "PP")} to {format(new Date(goal.endDate), "PP")}
+                    </p>
+                </div>
+                <div className="relative -mx-4">
+                    <ChartContainer config={chartConfig}>
+                        <AreaChart
+                            data={
+                                goal.progressLogs?.map((log) => ({
+                                    date: format(new Date(log.timestamp), "MMM dd"),
+                                    fullDate: format(new Date(log.timestamp), "MMM dd, yyyy"),
+                                    value: log.value,
+                                })) || []
+                            }
+                            margin={{
+                                left: 0,
+                                right: 8,
+                                top: 12,
+                                bottom: 12,
+                            }}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                            <YAxis
+                                hide={false}
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={4}
+                                width={32}
+                                domain={[
+                                    Math.min(...(goal.progressLogs?.map((log) => log.value) || [0])),
+                                    Math.max(...(goal.progressLogs?.map((log) => log.value) || [0])),
+                                ]}
+                            />
+                            <ChartTooltip
+                                cursor={false}
+                                content={({ active, payload, label }) => {
+                                    if (active && payload && payload.length) {
+                                        return (
+                                            <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[0.70rem] uppercase text-muted-foreground">Date</span>
+                                                        <span className="font-bold text-muted-foreground">
+                                                            {payload[0]?.payload?.fullDate || label}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[0.70rem] uppercase text-muted-foreground">Value</span>
+                                                        <span className="font-bold">
+                                                            {payload[0]?.value}
+                                                            {goal.unit && goal.unit !== "none" ? goal.unit : ""}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                            <defs>
+                                <linearGradient id="fillMetric" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.1} />
+                                </linearGradient>
+                            </defs>
+                            <Area
+                                dataKey="value"
+                                type="monotone"
+                                fill="url(#fillMetric)"
+                                fillOpacity={0.4}
+                                stroke="#3b82f6"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </AreaChart>
+                    </ChartContainer>
+                </div>
+                <div className="grid grid-cols-1 gap-4 text-sm">
+                    <div className="grid gap-2 border rounded-lg md:p-4 p-3">
+                        <div className="text-center">
+                            <div className="text-left text-2xl text-blue-600">
+                                {goal.currentValue.toFixed(1)}
+                                {!goal.unit || goal.unit == "none" ? "" : goal.unit}
+                            </div>
+                            <div className="flex items-center gap-2 text-bold leading-none text-muted-foreground">Current Value</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const startDate = new Date(goal.startDate);
     const endDate = new Date(goal.endDate);
     const currentDate = new Date();

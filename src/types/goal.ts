@@ -26,6 +26,7 @@ export interface Goal {
     description?: string;
     unit: Unit;
     progressLogs: ProgressLog[];
+    metric?: boolean;
 }
 
 export type Unit = "kg" | "€" | "%" | "km" | "h" | "none";

@@ -48,3 +48,11 @@ DROP POLICY "Users can view own goals" ON goals;
 CREATE POLICY "Users can manage own goals" ON goals
     FOR ALL USING (auth.uid() IS NOT NULL)
     WITH CHECK (auth.uid() IS NOT NULL);
+
+-- Add metric field to distinguish metric goals from regular goals
+ALTER TABLE goals ADD COLUMN metric BOOLEAN DEFAULT FALSE;
+
+-- Update the metric goals to set metric = TRUE
+UPDATE goals 
+SET metric = TRUE 
+WHERE title IN ('Cash', 'Weight', 'Screen Time');

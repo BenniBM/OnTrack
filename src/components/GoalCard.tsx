@@ -11,6 +11,24 @@ interface GoalCardProps {
 
 export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
     const navigate = useNavigate();
+
+    // For metric goals, don't show progress bars
+    if (goal.metric) {
+        return (
+            <Card className="hover:shadow-lg text-left transition-shadow cursor-pointer" onClick={() => navigate(`/goal/${goal.id}`)}>
+                <CardHeader className="pb-2 px-4 md:px-6">
+                    <CardTitle className="text-2xl md:text-2xl font-bold">{goal.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 md:px-6">
+                    <div className="text-sm text-muted-foreground">
+                        {goal.currentValue}
+                        {goal.unit && goal.unit !== "none" ? goal.unit : ""}
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
     const actualProgress = calculateActualProgress(goal);
     const expectedProgress = calculateExpectedProgress(goal);
 

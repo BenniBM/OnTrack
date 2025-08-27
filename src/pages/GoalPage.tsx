@@ -166,27 +166,30 @@ const GoalPage = () => {
                         <ArrowLeft className="h-4 w-4" />
                         Back
                     </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline">
-                                <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    setUpdateDialogOpen(true);
-                                }}>
-                                <Edit2 className="mr-2 h-4 w-4" /> Edit Goal
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
-                            </DropdownMenuItem>
-                            {/* <DropdownMenuItem onClick={() => {}}>
-                                <Download className="mr-2 h-4 w-4" /> Export CSV
-                            </DropdownMenuItem> */}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {/* Only show action menu for non-metric goals */}
+                    {!goal.metric && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">
+                                    <MoreHorizontal className="mr-2 h-4 w-4" /> Actions
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setUpdateDialogOpen(true);
+                                    }}>
+                                    <Edit2 className="mr-2 h-4 w-4" /> Edit Goal
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                                    <Trash2 className="mr-2 h-4 w-4" /> Delete Goal
+                                </DropdownMenuItem>
+                                {/* <DropdownMenuItem onClick={() => {}}>
+                                    <Download className="mr-2 h-4 w-4" /> Export CSV
+                                </DropdownMenuItem> */}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
 
                 <div className="space-y-4 md:space-y-6">
@@ -196,30 +199,33 @@ const GoalPage = () => {
                 </div>
                 <ProgressGraph goal={goalState ? goalState : goal} />
 
-                <div className="mt-20">
-                    <div className="flex justify-between items-end mb-4 text-left">
-                        <h2 className="text-2xl font-semibold">Log Progress</h2>
-                        <span className="text-sm text-muted-foreground">
-                            {progressValueState.toFixed(1)}% | {actualValueState.toFixed(1)}
-                        </span>
-                    </div>
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <Slider
-                                value={[progressValueState]}
-                                onValueChange={(value) => handleSliderChange(value[0])}
-                                max={100}
-                                step={1}
-                                className="w-full"
-                            />
+                {/* Only show progress logging for non-metric goals */}
+                {!goal.metric && (
+                    <div className="mt-20">
+                        <div className="flex justify-between items-end mb-4 text-left">
+                            <h2 className="text-2xl font-semibold">Log Progress</h2>
+                            <span className="text-sm text-muted-foreground">
+                                {progressValueState.toFixed(1)}% | {actualValueState.toFixed(1)}
+                            </span>
                         </div>
-                        <Button
-                            onClick={() => handleLogProgress(goal.startValue + (progressValueState / 100) * (goal.endValue - goal.startValue))}
-                            className="w-full">
-                            Save Progress
-                        </Button>
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <Slider
+                                    value={[progressValueState]}
+                                    onValueChange={(value) => handleSliderChange(value[0])}
+                                    max={100}
+                                    step={1}
+                                    className="w-full"
+                                />
+                            </div>
+                            <Button
+                                onClick={() => handleLogProgress(goal.startValue + (progressValueState / 100) * (goal.endValue - goal.startValue))}
+                                className="w-full">
+                                Save Progress
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {goal.type === "task" && (
                     <Card className="p-6">

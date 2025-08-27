@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, ChartBar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GoalCard } from "../components/GoalCard";
 import { CreateGoalDialog } from "../components/CreateGoalDialog";
@@ -80,12 +80,16 @@ const Index = () => {
         }
     };
 
-    // Separate active and completed goals
+    // Separate active, completed, and metric goals
     const activeGoals = goals.filter((goal) => {
+        // Exclude metric goals from active goals
+        if (goal.metric) return false;
+
         const isDecreasingGoal = goal.startValue > goal.endValue;
         return isDecreasingGoal ? goal.currentValue > goal.endValue : goal.currentValue < goal.endValue;
     });
-    const completedGoals = goals.filter((goal) => goal.currentValue == goal.endValue);
+    const completedGoals = goals.filter((goal) => !goal.metric && goal.currentValue == goal.endValue);
+    const metricGoals = goals.filter((goal) => goal.metric);
 
     return (
         <div className="container py-4 md:py-8 px-4 md:px-8">
@@ -101,6 +105,27 @@ const Index = () => {
                     </div>
                 )}
             </div>
+
+            {/* Metrics Accordion */}
+            {metricGoals.length > 0 && (
+                <Accordion type="single" collapsible className="w-full mb-6" defaultValue="metrics">
+                    <AccordionItem value="metrics">
+                        <AccordionTrigger>
+                            <div className="flex items-center">
+                                <ChartBar className="mr-2 h-4 w-4" />
+                                <span className="no-underline">Metrics</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                                {metricGoals.map((goal) => (
+                                    <GoalCard key={goal.id} goal={goal} />
+                                ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            )}
 
             {/* Completed Goals Accordion */}
             {completedGoals.length > 0 && (
