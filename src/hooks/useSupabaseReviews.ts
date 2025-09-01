@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Review, CreateReviewData, UpdateReviewData } from "../types/review";
 import { supabaseReviewStorage } from "../services/supabaseReviewStorage";
 import { supabase } from "../services/supabase";
+import { metricSyncService } from "../services/metricSyncService";
 
 export const useSupabaseReviews = () => {
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -51,6 +52,10 @@ export const useSupabaseReviews = () => {
             const newReview = await supabaseReviewStorage.createReview(reviewData);
             if (newReview) {
                 setReviews((prev) => [newReview, ...prev]);
+
+                // Sync metrics after review creation
+                await metricSyncService.syncAfterReviewUpdate(newReview);
+
                 return newReview;
             }
             return null;
@@ -65,6 +70,10 @@ export const useSupabaseReviews = () => {
             const updatedReview = await supabaseReviewStorage.updateReview(reviewData);
             if (updatedReview) {
                 setReviews((prev) => prev.map((r) => (r.id === reviewData.id ? updatedReview : r)));
+
+                // Sync metrics after review update
+                await metricSyncService.syncAfterReviewUpdate(updatedReview);
+
                 return updatedReview;
             }
             return null;

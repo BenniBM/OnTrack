@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Goal } from "../types/goal";
 import { supabaseGoalStorage } from "../services/supabaseStorage";
 import { supabase } from "../services/supabase";
+import { metricSyncService } from "../services/metricSyncService";
 
 export const useSupabaseGoals = () => {
     const [goals, setGoals] = useState<Goal[]>([]);
@@ -130,6 +131,15 @@ export const useSupabaseGoals = () => {
         }
     };
 
+    const syncMetrics = async () => {
+        try {
+            await metricSyncService.syncMetricsFromReviews();
+            await fetchGoals(); // Refresh goals after sync
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to sync metrics");
+        }
+    };
+
     return {
         goals,
         loading,
@@ -141,5 +151,6 @@ export const useSupabaseGoals = () => {
         updateProgressLogs,
         updateCurrentValue,
         refetch: fetchGoals,
+        syncMetrics,
     };
 };
