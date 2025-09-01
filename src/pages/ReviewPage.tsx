@@ -16,6 +16,7 @@ import { CreateReviewData, UpdateReviewData } from "@/types/review";
 import { FormItem, FormLabel } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { formatYearWeek } from "@/utils/weekUtils";
+import GoogleDriveViewer from "@/components/GoogleDriveViewer";
 
 const ReviewPage = () => {
     const [highlights, setHighlights] = useState("");
@@ -424,7 +425,7 @@ const ReviewPage = () => {
                         </Button>
                     </CollapsibleTrigger>
 
-                    <CollapsibleContent className="space-y-4 mt-6">
+                    <CollapsibleContent className="space-y-4 mt-6 mb-16">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-500">Cash (€)</label>
                             <Input
@@ -480,6 +481,8 @@ const ReviewPage = () => {
                         </div>
                     </CollapsibleContent>
                 </Collapsible>
+
+                <GoogleDriveViewer className="mb-16" reviewDate={createdAt || new Date()} />
 
                 <div className="fixed bottom-0 md:max-w-4xl mx-auto md:border-t-0 left-0 right-0 bg-white p-4 border-t">
                     <div className="flex justify-center gap-x-3">
