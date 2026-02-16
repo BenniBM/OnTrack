@@ -482,7 +482,7 @@ const ReviewPage = () => {
                     </CollapsibleContent>
                 </Collapsible>
 
-                <GoogleDriveViewer className="mb-16" reviewDate={createdAt || new Date()} />
+                {/* <GoogleDriveViewer className="mb-16" reviewDate={createdAt || new Date()} /> */}
 
                 <div className="fixed bottom-0 md:max-w-4xl mx-auto md:border-t-0 left-0 right-0 bg-white p-4 border-t">
                     <div className="flex justify-center gap-x-3">
