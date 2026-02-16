@@ -277,7 +277,7 @@ const ReviewPage = () => {
                             placeholder="Write down your highlights, achievements, or reflections for this review..."
                             value={highlights}
                             onChange={(e) => setHighlights(convertDashesToBullets(e.target.value))}
-                            className="min-h-[200px] border-none focus:border-none text-gray-700 dark:text-gray-300 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
+                            className="min-h-[200px] border-none focus:border-none text-gray-700 dark:text-gray-400 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
                             rows={Math.max(2, highlights.split("\n").length)}
                             style={{ height: "auto", minHeight: "70px" }}
@@ -301,7 +301,7 @@ const ReviewPage = () => {
                             placeholder="What went well? What are you proud of? What positive experiences did you have?"
                             value={good}
                             onChange={(e) => setGood(convertDashesToBullets(e.target.value))}
-                            className="min-h-[150px] border-none focus:border-none text-gray-700 dark:text-gray-300 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
+                            className="min-h-[150px] border-none focus:border-none text-gray-700 dark:text-gray-400 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
                             rows={Math.max(2, good.split("\n").length)}
                             style={{ height: "auto", minHeight: "70px" }}
@@ -325,7 +325,7 @@ const ReviewPage = () => {
                             placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
                             value={bad}
                             onChange={(e) => setBad(convertDashesToBullets(e.target.value))}
-                            className="min-h-[150px] border-none focus:border-none text-gray-700 dark:text-gray-300 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
+                            className="min-h-[150px] border-none focus:border-none text-gray-700 dark:text-gray-400 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
                             rows={Math.max(2, bad.split("\n").length)}
                             style={{ height: "auto", minHeight: "70px" }}
