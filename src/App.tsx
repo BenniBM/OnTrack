@@ -8,6 +8,7 @@ import LoginScreen from "./components/LoginScreen";
 import { TabNavigation } from "./components/TabNavigation";
 import "./App.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 
 const ProtectedRoutes = () => {
@@ -40,9 +41,11 @@ const ProtectedRoutes = () => {
 
 function App() {
     return (
-        <AuthProvider>
-            <ProtectedRoutes />
-        </AuthProvider>
+        <ThemeProvider>
+            <AuthProvider>
+                <ProtectedRoutes />
+            </AuthProvider>
+        </ThemeProvider>
     );
 }
 

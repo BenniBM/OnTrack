@@ -166,21 +166,21 @@ export const ProgressLogs: React.FC<ProgressLogsProps> = ({ goal, onUpdateLogs }
                                             className="focus:hover:bg-transparent hover:bg-transparent"
                                             size="icon"
                                             onClick={handleSaveEdit}>
-                                            <Check className="h-4 w-4 text-green-500" />
+                                            <Check className="h-4 w-4 text-primary" />
                                         </Button>
                                         <Button
                                             variant="ghost"
                                             className="focus:bg-transparent hover:bg-transparent"
                                             size="icon"
                                             onClick={() => setEditingLogId(null)}>
-                                            <X className="h-4 w-4 text-red-500" />
+                                            <X className="h-4 w-4 text-destructive" />
                                         </Button>
                                     </>
                                 ) : (
                                     <>
                                         <Button
                                             variant="ghost"
-                                            className="focus:bg-transparent hover:bg-transparent focus:text-black hover:text-black"
+                                            className="focus:bg-transparent hover:bg-transparent"
                                             size="icon"
                                             onClick={() => handleStartEdit(log)}>
                                             <Edit className="h-4 w-4" />

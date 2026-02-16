@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "../contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 const LoginScreen = () => {
     const [email, setEmail] = useState("benni.mehlbm@gmail.com");
@@ -28,7 +29,10 @@ const LoginScreen = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center relative">
+            <div className="absolute top-4 right-4">
+                <ThemeToggle />
+            </div>
             <Card className="w-full border-none max-w-md">
                 <CardContent className="p-0">
                     <form onSubmit={handleSubmit} className="space-y-4 text-left">
@@ -56,7 +60,7 @@ const LoginScreen = () => {
                                 disabled={isLoading}
                             />
                         </div>
-                        {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">{error}</div>}
+                        {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
                         <Button type="submit" className="w-full" disabled={isLoading}>
                             {isLoading ? (
                                 <>

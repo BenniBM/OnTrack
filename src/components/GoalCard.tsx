@@ -51,7 +51,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
                         <span>Expected Progress</span>
                         <span>{expectedProgress.toFixed(1)}%</span>
                     </div>
-                    <Progress value={expectedProgress} bgColor={"bg-[#475569]"} className="h-2" />
+                    <Progress value={expectedProgress} bgColor={"bg-muted"} className="h-2" />
                 </div>
             </CardContent>
         </Card>

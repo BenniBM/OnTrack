@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Target, Book } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const TabNavigation: React.FC = () => {
     const navigate = useNavigate();
@@ -17,8 +18,8 @@ export const TabNavigation: React.FC = () => {
 
     return (
         <div className="w-full px-4 py-3">
-            <div className="flex w-full">
-                <div className="flex space-x-1 bg-muted p-1 rounded-lg w-full">
+            <div className="flex w-full items-center gap-3">
+                <div className="flex space-x-1 bg-muted p-1 rounded-lg flex-1">
                     <button
                         onClick={() => navigate("/")}
                         className={`px-4 py-2 rounded-md text-sm flex items-center justify-center font-medium transition-colors flex-1 ${
@@ -38,6 +39,7 @@ export const TabNavigation: React.FC = () => {
                         Reviews
                     </button>
                 </div>
+                <ThemeToggle />
             </div>
         </div>
     );

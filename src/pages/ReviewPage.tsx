@@ -277,7 +277,7 @@ const ReviewPage = () => {
                             placeholder="Write down your highlights, achievements, or reflections for this review..."
                             value={highlights}
                             onChange={(e) => setHighlights(convertDashesToBullets(e.target.value))}
-                            className="min-h-[200px] border-none focus:border-none text-gray-700 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
+                            className="min-h-[200px] border-none focus:border-none text-gray-700 dark:text-gray-300 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
                             rows={Math.max(2, highlights.split("\n").length)}
                             style={{ height: "auto", minHeight: "70px" }}
@@ -301,7 +301,7 @@ const ReviewPage = () => {
                             placeholder="What went well? What are you proud of? What positive experiences did you have?"
                             value={good}
                             onChange={(e) => setGood(convertDashesToBullets(e.target.value))}
-                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
+                            className="min-h-[150px] border-none focus:border-none text-gray-700 dark:text-gray-300 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
                             rows={Math.max(2, good.split("\n").length)}
                             style={{ height: "auto", minHeight: "70px" }}
@@ -313,7 +313,7 @@ const ReviewPage = () => {
                 <Collapsible open={badOpen} onOpenChange={setBadOpen}>
                     <CollapsibleTrigger asChild>
                         <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                            <label className="text-xl font-semibold cursor-pointer flex items-center gap-2">
+                            <label className="font-semibold text-xl cursor-pointer flex items-center gap-2">
                                 <XCircle /> What's Bad?
                             </label>
                             {badOpen ? <ChevronDown /> : <ChevronRight />}
@@ -325,7 +325,7 @@ const ReviewPage = () => {
                             placeholder="What didn't go well? What challenges did you face? What would you like to improve?"
                             value={bad}
                             onChange={(e) => setBad(convertDashesToBullets(e.target.value))}
-                            className="min-h-[150px] border-none focus:border-none focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
+                            className="min-h-[150px] border-none focus:border-none text-gray-700 dark:text-gray-300 focus-visible:ring-0 px-0 focus-visible:ring-offset-0 resize-none"
                             disabled={loading}
                             rows={Math.max(2, bad.split("\n").length)}
                             style={{ height: "auto", minHeight: "70px" }}
@@ -484,7 +484,7 @@ const ReviewPage = () => {
 
                 {/* <GoogleDriveViewer className="mb-16" reviewDate={createdAt || new Date()} /> */}
 
-                <div className="fixed bottom-0 md:max-w-4xl mx-auto md:border-t-0 left-0 right-0 bg-white p-4 border-t">
+                <div className="fixed bottom-0 md:max-w-4xl mx-auto md:border-t-0 left-0 right-0 bg-white dark:bg-background p-4 border-t">
                     <div className="flex justify-center gap-x-3">
                         {isEditing ? (
                             <>

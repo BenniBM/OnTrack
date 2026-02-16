@@ -46,7 +46,7 @@ const GoalPage = () => {
     }, [goal]);
 
     if (loading) return <LoadingSpinner />;
-    if (error) return <div className="container py-8 px-4 text-center text-red-500">Error: {error}</div>;
+    if (error) return <div className="container py-8 px-4 text-center text-destructive">Error: {error}</div>;
     if (!goals) return null;
 
     if (!goal) {

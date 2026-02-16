@@ -34,8 +34,8 @@ const ReviewsList = () => {
     if (error) {
         return (
             <div className="text-center py-8">
-                <p className="text-red-500">{error}</p>
-                <button onClick={refetch} className="mt-2 text-blue-500 hover:underline">
+                <p className="text-destructive">{error}</p>
+                <button onClick={refetch} className="mt-2 text-primary hover:underline">
                     Try again
                 </button>
             </div>
@@ -59,7 +59,7 @@ const ReviewsList = () => {
                 return (
                     <Card
                         key={review.id}
-                        className="hover:shadow-md text-left transition-shadow cursor-pointer hover:bg-gray-50"
+                        className="hover:shadow-md text-left transition-shadow cursor-pointer hover:bg-accent/50"
                         onClick={() => navigate(`/review/${review.id}`)}>
                         <CardHeader className="pb-2 px-4 md:px-6">
                             <CardTitle className="text-2xl md:text-2xl font-bold">Week {weekNumber.toString().padStart(2, "0")}</CardTitle>

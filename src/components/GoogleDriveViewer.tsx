@@ -205,12 +205,12 @@ const GoogleDriveViewer = ({ reviewDate, className }: GoogleDriveViewerProps) =>
                     </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-4 mt-4">
-                    {error && <div className="text-red-500 text-sm p-2 bg-red-50 rounded">{error}</div>}
+                    {error && <div className="text-destructive text-sm p-2 bg-destructive/10 rounded">{error}</div>}
 
                     {loading && (
                         <div className="text-center py-4">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                            <p className="text-sm text-gray-500 mt-2">Loading files...</p>
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                            <p className="text-sm text-muted-foreground mt-2">Loading files...</p>
                         </div>
                     )}
 
@@ -238,7 +238,7 @@ const GoogleDriveViewer = ({ reviewDate, className }: GoogleDriveViewerProps) =>
                                                 </div>
                                             )}
                                             {isVideo(file.mimeType) && (
-                                                <div className="aspect-video overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                <div className="aspect-video overflow-hidden bg-muted flex items-center justify-center">
                                                     <iframe
                                                         src={getVideoUrl(file)}
                                                         className="w-full h-full"
@@ -249,7 +249,7 @@ const GoogleDriveViewer = ({ reviewDate, className }: GoogleDriveViewerProps) =>
                                                 </div>
                                             )}
                                             {!isImage(file.mimeType) && !isVideo(file.mimeType) && (
-                                                <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                                                <div className="aspect-square bg-muted flex items-center justify-center">
                                                     {getFileIcon(file.mimeType)}
                                                 </div>
                                             )}
@@ -259,9 +259,9 @@ const GoogleDriveViewer = ({ reviewDate, className }: GoogleDriveViewerProps) =>
                                                         <p className="font-medium text-sm truncate" title={file.name}>
                                                             {file.name}
                                                         </p>
-                                                        <p className="text-xs text-gray-500">{file.size && formatFileSize(file.size)}</p>
+                                                        <p className="text-xs text-muted-foreground">{file.size && formatFileSize(file.size)}</p>
                                                         {file.modifiedTime && (
-                                                            <p className="text-xs text-gray-500">
+                                                            <p className="text-xs text-muted-foreground">
                                                                 {new Date(file.modifiedTime).toLocaleDateString()}
                                                             </p>
                                                         )}
@@ -271,7 +271,7 @@ const GoogleDriveViewer = ({ reviewDate, className }: GoogleDriveViewerProps) =>
                                                             href={file.webViewLink}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-blue-500 hover:text-blue-700">
+                                                            className="text-primary hover:text-primary/80">
                                                             <ExternalLink className="h-4 w-4" />
                                                         </a>
                                                     )}
